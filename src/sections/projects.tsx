@@ -5,6 +5,7 @@ import { FaGithub } from "react-icons/fa";
 import { LiaExternalLinkAltSolid } from "react-icons/lia";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Projects() {
   const router = useRouter();
@@ -23,14 +24,7 @@ export default function Projects() {
             key={index}
             className="overflow-hidden transition-all duration-300 rounded-lg"
           >
-            <video
-              src={project.src}
-              className="object-contain w-full h-48 sm:h-56 md:h-64"
-              autoPlay
-              loop
-              muted
-              playsInline
-            />
+           <Image src={project.src} alt={project.name} width={500} height={500} />
 
             <div className="w-full flex justify-between bg-white text-black dark:text-white dark:bg-transparent border border-neutral-200 dark:border-white/10 rounded-lg p-2 items-center mt-2 shadow-sm">
               <div className="font-bold tracking-tight text-[12px]">{project.name}</div>

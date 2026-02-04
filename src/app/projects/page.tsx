@@ -5,6 +5,7 @@ import { FaGithub } from "react-icons/fa";
 import { LiaExternalLinkAltSolid } from "react-icons/lia";
 import { useRouter } from "next/navigation";
 import { IoIosArrowBack } from "react-icons/io";
+import Image from "next/image";
 
 export default function ProjectsPage() {
     const router = useRouter();
@@ -42,14 +43,7 @@ export default function ProjectsPage() {
                         >
                             {/* Left — Video */}
                             <div className="w-full flex justify-center">
-                                <video
-                                    src={project.src}
-                                    className="rounded-lg shadow-md w-full max-w-sm object-cover"
-                                    autoPlay
-                                    loop
-                                    muted
-                                    playsInline
-                                />
+                                <Image src={project.src} alt={project.name} width={500} height={500} />
                             </div>
 
                             {/* Right — Content */}

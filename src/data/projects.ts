@@ -1,7 +1,7 @@
 export const projects = [
     {
         name: "SkillMatch",
-        src: "/devnest.mp4",
+        src: "/skillmatch.png",
         github: "https://github.com/swamiabhishek45/skillmatch",
         live: "https://skillmatch45.vercel.app/",
         shortDescription:
@@ -21,7 +21,7 @@ export const projects = [
     },
     {
         name: "LiveDocs",
-        src: "/liftlog.mp4",
+        src: "/livedoc.png",
         github: "https://github.com/swamiabhishek45/LiveDocs",
         live: "https://livedocs45.vercel.app/",
         shortDescription:
@@ -42,7 +42,7 @@ export const projects = [
     },
     {
         name: "Pollution Pulse",
-        src: "/subtrackr.mp4",
+        src: "/pollutionpulse.png",
         github: "https://github.com/swamiabhishek45/pollution-pulse2",
         live: "https://pollution-pulse2.vercel.app/",
         shortDescription:
