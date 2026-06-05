@@ -29,7 +29,7 @@ export default function About() {
 
       <div className="mt-6 flex flex-col md:flex-row gap-4 items-center justify-center w-full">
         {/* <SpotifyCard /> */}
-        <DeveloperStatus />
+        {/* <DeveloperStatus /> */}
       </div>
     </section>
   );

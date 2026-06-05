@@ -39,6 +39,7 @@ export async function GET() {
       project: "My-Portfolio-2.0",
       language: "TypeScript",
       lastActive: new Date().toISOString(),
+      activeTimeToday: "45 mins",
       isMock: true,
     });
   }
@@ -46,22 +47,45 @@ export async function GET() {
   try {
     const basic = Buffer.from(WAKATIME_API_KEY).toString("base64");
     
-    // Fetch the current user details, which contains the latest heartbeat metadata
-    const response = await fetch("https://wakatime.com/api/v1/users/current", {
-      headers: {
-        Authorization: `Basic ${basic}`,
-      },
-      cache: "no-store",
-    });
+    // Fetch both the current user details and today's status bar data in parallel
+    const [userRes, statusBarRes] = await Promise.all([
+      fetch("https://wakatime.com/api/v1/users/current", {
+        headers: {
+          Authorization: `Basic ${basic}`,
+        },
+        cache: "no-store",
+      }),
+      fetch("https://wakatime.com/api/v1/users/current/status_bar/today", {
+        headers: {
+          Authorization: `Basic ${basic}`,
+        },
+        cache: "no-store",
+      }).catch((err) => {
+        console.error("Failed to fetch WakaTime status_bar/today:", err);
+        return null;
+      }),
+    ]);
 
-    if (!response.ok) {
-      throw new Error(`WakaTime API returned status ${response.status}`);
+    if (!userRes.ok) {
+      throw new Error(`WakaTime user API returned status ${userRes.status}`);
     }
 
-    const { data } = await response.json();
+    const userData = await userRes.json();
+    const data = userData.data;
 
     if (!data) {
-      throw new Error("No data returned from WakaTime API");
+      throw new Error("No user data returned from WakaTime API");
+    }
+
+    // Try parsing status bar data for active time today
+    let activeTimeToday = "0 mins";
+    if (statusBarRes && statusBarRes.ok) {
+      try {
+        const statusBarData = await statusBarRes.json();
+        activeTimeToday = statusBarData?.data?.grand_total?.text || "0 mins";
+      } catch (err) {
+        console.error("Failed to parse WakaTime status bar JSON:", err);
+      }
     }
 
     const lastHeartbeatAt = data.last_heartbeat_at;
@@ -76,6 +100,7 @@ export async function GET() {
         project: null,
         language: null,
         lastActive: null,
+        activeTimeToday,
         isMock: false,
       });
     }
@@ -96,6 +121,7 @@ export async function GET() {
       project: lastProject,
       language: lastLanguage,
       lastActive: lastHeartbeatAt,
+      activeTimeToday,
       isMock: false,
     });
   } catch (error) {
@@ -107,6 +133,7 @@ export async function GET() {
       project: "My-Portfolio-2.0",
       language: "TypeScript",
       lastActive: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+      activeTimeToday: "12 mins",
       isMock: true,
       error: error instanceof Error ? error.message : "Unknown error",
     });

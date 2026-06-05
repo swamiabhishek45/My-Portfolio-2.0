@@ -18,9 +18,13 @@ export default function Header() {
   const editor = statusData?.editor || "VS Code";
   const statusText = statusData
     ? isCoding
-      ? `Coding in ${editor}`
-      : "Idle"
+      ? `Cooking in ${editor}`
+      : "Idle · Reading books"
     : "Loading status...";
+
+  const activeTimeText = statusData?.activeTimeToday
+    ? ` • ${statusData.activeTimeToday} active today`
+    : "";
 
   useEffect(() => {
     async function fetchVisitorCount() {
@@ -99,7 +103,7 @@ export default function Header() {
                 }`}
               ></span>
             </span>
-            <span>{statusText}</span>
+            <span>{statusText}{activeTimeText}</span>
           </div>
         </div>
       </div>
