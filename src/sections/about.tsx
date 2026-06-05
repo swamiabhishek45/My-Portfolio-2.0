@@ -1,3 +1,5 @@
+import SpotifyCard from "@/components/spotify-card";
+
 export default function About() {
   return (
     <section className="border p-5 rounded-lg">
@@ -23,6 +25,10 @@ export default function About() {
         maintainability. I enjoy breaking down complex problems and building
         software that scales well in real-world applications.
       </p>
+
+      <div className="mt-6 flex justify-center">
+        <SpotifyCard />
+      </div>
     </section>
   );
 }
