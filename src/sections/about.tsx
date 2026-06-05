@@ -1,9 +1,10 @@
 import SpotifyCard from "@/components/spotify-card";
+import DeveloperStatus from "@/components/developer-status";
 
 export default function About() {
   return (
-    <section className="border p-5 rounded-lg">
-      <h2 className="text-xl font-semibold mb-3 border-b border-neutral-400 pb-1">
+    <section className="border border-neutral-200 dark:border-neutral-800/80 p-5 rounded-2xl bg-neutral-50/10 dark:bg-neutral-900/10">
+      <h2 className="text-xl font-semibold mb-3 border-b border-neutral-200 dark:border-neutral-800/80 pb-1">
         About
       </h2>
 
@@ -26,8 +27,9 @@ export default function About() {
         software that scales well in real-world applications.
       </p>
 
-      <div className="mt-6 flex justify-center">
-        <SpotifyCard />
+      <div className="mt-6 flex flex-col md:flex-row gap-4 items-center justify-center w-full">
+        {/* <SpotifyCard /> */}
+        <DeveloperStatus />
       </div>
     </section>
   );

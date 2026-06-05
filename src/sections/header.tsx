@@ -1,11 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { Eye, BadgeCheck, Globe } from "lucide-react";
 
 export default function Header() {
   const [visitorCount, setVisitorCount] = useState<number | null>(null);
+
+  const { data: statusData } = useSWR(
+    "/api/wakatime",
+    (url) => fetch(url).then((res) => res.json()),
+    { refreshInterval: 60000 }
+  );
+
+  const isCoding = statusData?.status === "coding";
+  const editor = statusData?.editor || "VS Code";
+  const statusText = statusData
+    ? isCoding
+      ? `Coding in ${editor}`
+      : "Idle"
+    : "Loading status...";
 
   useEffect(() => {
     async function fetchVisitorCount() {
@@ -67,12 +82,24 @@ export default function Header() {
           </div>
 
           {/* Status Bar */}
-          <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+          <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400 h-5">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+              {(!statusData || isCoding) && (
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${
+                  isCoding ? "bg-green-400" : "bg-neutral-400 dark:bg-neutral-600 opacity-75"
+                }`}></span>
+              )}
+              <span
+                className={`relative inline-flex rounded-full h-2 w-2 ${
+                  statusData
+                    ? isCoding
+                      ? "bg-green-500"
+                      : "bg-neutral-400 dark:bg-neutral-600"
+                    : "bg-neutral-300 dark:bg-neutral-700"
+                }`}
+              ></span>
             </span>
-            <span>Idle • Currently coding</span>
+            <span>{statusText}</span>
           </div>
         </div>
       </div>
