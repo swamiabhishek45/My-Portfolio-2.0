@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import ScannerAvatar from "@/components/ui/scanner-avatar";
+import CountUp from "@/components/ui/count-up";
 import { Eye, BadgeCheck, Globe } from "lucide-react";
 
 export default function Header() {
@@ -49,7 +50,7 @@ export default function Header() {
         {visitorCount !== null && (
           <div className="flex items-center gap-1.5 text-xs font-mono text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800/50 px-2 py-1 rounded-md border border-neutral-200/50 dark:border-neutral-800/30">
             <Eye className="w-3.5 h-3.5" />
-            <span>{visitorCount.toLocaleString()}</span>
+            <CountUp end={visitorCount} duration={2} />
           </div>
         )}
         <AnimatedThemeToggler />
