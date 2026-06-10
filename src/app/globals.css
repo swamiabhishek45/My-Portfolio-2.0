@@ -16,8 +16,15 @@
   --animate-bounce-slow: bounce-slow 1.2s ease-in-out infinite;
 
   @keyframes bounce-slow {
-    0%, 100% { transform: scaleY(0.3); }
-    50% { transform: scaleY(1); }
+
+    0%,
+    100% {
+      transform: scaleY(0.3);
+    }
+
+    50% {
+      transform: scaleY(1);
+    }
   }
 
   --radius-sm: calc(var(--radius) - 4px);
@@ -186,7 +193,8 @@
     @apply bg-background text-foreground font-sans;
   }
 
-  code, pre {
+  code,
+  pre {
     @apply font-mono;
   }
 }
@@ -260,4 +268,149 @@
   100% {
     transform: rotate(0deg);
   }
+}
+
+/* Premium Retro Scanner Transition Effects */
+.scanner-lines {
+  background: repeating-linear-gradient(to bottom,
+      rgba(255, 255, 255, 0) 0px,
+      rgba(255, 255, 255, 0) 2px,
+      rgba(255, 255, 255, 0.1) 2px,
+      rgba(255, 255, 255, 0.1) 3px);
+  background-size: 100% 4px;
+  pointer-events: none;
+}
+
+.dark .scanner-lines {
+  background: repeating-linear-gradient(to bottom,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(255, 255, 255, 0.05) 2px,
+      rgba(255, 255, 255, 0.05) 3px);
+  background-size: 100% 4px;
+}
+
+@keyframes scanner-scanline-scroll {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 0 100%;
+  }
+}
+
+.animate-scanner-scanline-scroll {
+  animation: scanner-scanline-scroll 4s linear infinite;
+}
+
+/* Sweep bar styling */
+.scanner-sweep-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.8) 20%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 255, 255, 0.8) 80%,
+      rgba(255, 255, 255, 0) 100%);
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.8),
+    0 0 20px rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+  z-index: 30;
+}
+
+.dark .scanner-sweep-bar {
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.9) 20%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 255, 255, 0.9) 80%,
+      rgba(255, 255, 255, 0) 100%);
+  box-shadow:
+    0 0 12px rgba(255, 255, 255, 0.9),
+    0 0 24px rgba(255, 255, 255, 0.5);
+}
+
+/* Color tints */
+.scanner-tint-blue {
+  background-color: rgba(59, 130, 246, 0.2);
+  mix-blend-mode: color-burn;
+}
+
+.scanner-tint-green {
+  background-color: rgba(34, 197, 94, 0.2);
+  mix-blend-mode: color-burn;
+}
+
+.scanner-tint-pink {
+  background-color: rgba(236, 72, 153, 0.2);
+  mix-blend-mode: color-burn;
+}
+
+.dark .scanner-tint-blue {
+  background-color: rgba(59, 130, 246, 0.25);
+  mix-blend-mode: overlay;
+}
+
+.dark .scanner-tint-green {
+  background-color: rgba(34, 197, 94, 0.25);
+  mix-blend-mode: overlay;
+}
+
+.dark .scanner-tint-pink {
+  background-color: rgba(236, 72, 153, 0.25);
+  mix-blend-mode: overlay;
+}
+
+/* Shakes and blurs */
+@keyframes scanner-shake-heavy {
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  20% {
+    transform: translate(-3px, 0.5px);
+  }
+
+  40% {
+    transform: translate(3px, -0.5px);
+  }
+
+  60% {
+    transform: translate(-2px, -0.5px);
+  }
+
+  80% {
+    transform: translate(2px, 0.5px);
+  }
+}
+
+@keyframes scanner-shake-light {
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  33% {
+    transform: translate(-1px, 0.2px);
+  }
+
+  66% {
+    transform: translate(1px, -0.2px);
+  }
+}
+
+.animate-scanner-shake-heavy {
+  animation: scanner-shake-heavy 0.08s infinite;
+}
+
+.animate-scanner-shake-light {
+  animation: scanner-shake-light 0.08s infinite;
 }

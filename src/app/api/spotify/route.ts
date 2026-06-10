@@ -29,6 +29,10 @@ const getAccessToken = async () => {
 };
 
 export async function GET() {
+  const cacheHeaders = {
+    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+  };
+
   // If credentials are not set, return mock data matching the user's reference image
   if (!client_id || !client_secret || !refresh_token) {
     return NextResponse.json({
@@ -38,6 +42,8 @@ export async function GET() {
       album: "In a Perfect World",
       albumImageUrl: "https://i.scdn.co/image/ab67616d0000b273b400994f31c26c04f981014e",
       songUrl: "https://open.spotify.com/track/1a2RlhZ6aU3a4eM1962j4d",
+    }, {
+      headers: cacheHeaders,
     });
   }
 
@@ -82,6 +88,8 @@ export async function GET() {
         album: track.album.name,
         albumImageUrl: track.album.images[0]?.url,
         songUrl: track.external_urls.spotify,
+      }, {
+        headers: cacheHeaders,
       });
     }
 
@@ -97,6 +105,8 @@ export async function GET() {
       album: song.item.album.name,
       albumImageUrl: song.item.album.images[0]?.url,
       songUrl: song.item.external_urls.spotify,
+    }, {
+      headers: cacheHeaders,
     });
   } catch (error) {
     console.error("Spotify API error, returning mock track:", error);
@@ -107,6 +117,8 @@ export async function GET() {
       album: "In a Perfect World",
       albumImageUrl: "https://i.scdn.co/image/ab67616d0000b273b400994f31c26c04f981014e",
       songUrl: "https://open.spotify.com/track/1a2RlhZ6aU3a4eM1962j4d",
+    }, {
+      headers: cacheHeaders,
     });
   }
 }

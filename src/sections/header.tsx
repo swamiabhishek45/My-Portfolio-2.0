@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+import ScannerAvatar from "@/components/ui/scanner-avatar";
 import { Eye, BadgeCheck, Globe } from "lucide-react";
 
 export default function Header() {
@@ -57,13 +58,13 @@ export default function Header() {
       {/* Main Profile Info */}
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6 mt-4 sm:mt-0">
         {/* Avatar */}
-        <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 overflow-hidden shrink-0 shadow-sm relative group">
-          <img
-            src="/avatar.png"
-            alt="Abhishek Swami"
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        </div>
+        <ScannerAvatar
+          primaryImage="/avatar.png"
+          secondaryImage="/photo.png"
+          interval={3000}
+          duration={650}
+          className="w-24 h-24 sm:w-28 sm:h-28 border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 shrink-0 shadow-sm"
+        />
 
         {/* Details */}
         <div className="flex flex-col items-center sm:items-start text-center sm:text-left justify-center h-full sm:pt-2">
@@ -89,18 +90,16 @@ export default function Header() {
           <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400 h-5">
             <span className="relative flex h-2 w-2">
               {(!statusData || isCoding) && (
-                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${
-                  isCoding ? "bg-green-400" : "bg-neutral-400 dark:bg-neutral-600 opacity-75"
-                }`}></span>
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isCoding ? "bg-green-400" : "bg-neutral-400 dark:bg-neutral-600 opacity-75"
+                  }`}></span>
               )}
               <span
-                className={`relative inline-flex rounded-full h-2 w-2 ${
-                  statusData
+                className={`relative inline-flex rounded-full h-2 w-2 ${statusData
                     ? isCoding
                       ? "bg-green-500"
                       : "bg-neutral-400 dark:bg-neutral-600"
                     : "bg-neutral-300 dark:bg-neutral-700"
-                }`}
+                  }`}
               ></span>
             </span>
             <span>{statusText}{activeTimeText}</span>

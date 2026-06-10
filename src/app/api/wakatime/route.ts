@@ -31,6 +31,10 @@ function getEditorName(pluginString: string): string {
 }
 
 export async function GET() {
+  const cacheHeaders = {
+    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+  };
+
   // If API key is not configured, return realistic mock data matching the user's requirements
   if (!WAKATIME_API_KEY) {
     return NextResponse.json({
@@ -41,6 +45,8 @@ export async function GET() {
       lastActive: new Date().toISOString(),
       activeTimeToday: "45 mins",
       isMock: true,
+    }, {
+      headers: cacheHeaders,
     });
   }
 
@@ -102,6 +108,8 @@ export async function GET() {
         lastActive: null,
         activeTimeToday,
         isMock: false,
+      }, {
+        headers: cacheHeaders,
       });
     }
 
@@ -123,6 +131,8 @@ export async function GET() {
       lastActive: lastHeartbeatAt,
       activeTimeToday,
       isMock: false,
+    }, {
+      headers: cacheHeaders,
     });
   } catch (error) {
     console.error("Error in WakaTime developer status API:", error);
@@ -136,6 +146,8 @@ export async function GET() {
       activeTimeToday: "12 mins",
       isMock: true,
       error: error instanceof Error ? error.message : "Unknown error",
+    }, {
+      headers: cacheHeaders,
     });
   }
 }
