@@ -11,30 +11,31 @@ export const aboutBullets: AboutBullet[] = [
   {
     segments: [
       { text: "Full Stack Developer", bold: true },
-      { text: " with ", bold: false },
-      { text: "3+ years of experience", bold: true },
-      { text: ",", bold: false },
+      { text: " ", bold: false },
+      { text: "", bold: true },
+      { text: "", bold: false },
     ],
   },
-  {
+    {
     segments: [
       { text: "Skilled in ", bold: false },
-      { text: "Next.js, React, Angular, TypeScript & Golang", bold: true },
+      { text: "Next.js, React, JavaScript, Node.js, & MongoDB", bold: true },
       { text: ".", bold: false },
     ],
   },
-  {
-    segments: [
-      { text: "Passionate about ", bold: false },
-      { text: "exploring new technologies & learning design philosophy", bold: true },
-      { text: ".", bold: false },
-    ],
-  },
-  {
+   {
     segments: [
       { text: "Learning in ", bold: false },
       { text: "System Design & GenAI", bold: true },
       { text: ".", bold: false },
     ],
   },
+  {
+    segments: [
+      { text: "Passionate about ", bold: false },
+      { text: "exploring new technologies & learning new things", bold: true },
+      { text: ".", bold: false },
+    ],
+  },
+ 
 ];

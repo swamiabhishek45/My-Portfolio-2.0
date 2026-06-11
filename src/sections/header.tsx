@@ -84,7 +84,7 @@ export default function Header() {
 
           {/* Subtitles */}
           <div className="text-sm sm:text-base font-medium text-neutral-600 dark:text-neutral-400 mb-2">
-            22 • Software Engineer
+            22 • Full Stack Developer
           </div>
 
           {/* Status Bar */}
