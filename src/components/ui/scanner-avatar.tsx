@@ -48,7 +48,7 @@ export default function ScannerAvatar({
   const primaryImgRef = useRef<HTMLImageElement | null>(null);
   const secondaryImgRef = useRef<HTMLImageElement | null>(null);
   const animFrameRef = useRef<number>(0);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const shakeControls = useAnimation();
 
   // Preload images
