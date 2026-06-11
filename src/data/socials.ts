@@ -14,5 +14,4 @@ export const socialLinks: SocialLink[] = [
   { name: "GitHub", link: "https://github.com/swamiabhishek45", icon: FaGithub },
   { name: "LeetCode", link: "https://leetcode.com/swamiabhishek45", icon: SiLeetcode },
   { name: "YouTube", link: "https://youtube.com/@swamiabhishek45", icon: FaYoutube },
-  { name: "Discord", link: "https://discord.com/users/swamiabhishek45", icon: FaDiscord },
 ];

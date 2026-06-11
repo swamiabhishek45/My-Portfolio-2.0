@@ -1,17 +1,31 @@
-export interface OverviewData {
-  role?: string;
+export interface Role {
+  title: string;
   company?: string;
-  resumeUrl: string;
+  iconName: "code" | "lightbulb" | "user" | "globe";
+}
+
+export interface OverviewData {
+  roles: Role[];
   location: string;
   phone: string;
   phoneRaw: string;
   email: string;
+  website: string;
+  websiteRaw: string;
+  gender: string;
+  timezone: string;
 }
 
 export const overviewData: OverviewData = {
-  resumeUrl: "/resume.pdf",
+  roles: [
+    { title: "Full stack Developer", iconName: "code" }
+  ],
   location: "Pune, Maharashtra, India",
   phone: "+91 89560 08591",
   phoneRaw: "tel:+918956008591",
   email: "abhishekswami1435@gmail.com",
+  website: "swamiabhishek.online",
+  websiteRaw: "https://github.com/swamiabhishek45",
+  gender: "he/him",
+  timezone: "Asia/Kolkata"
 };
