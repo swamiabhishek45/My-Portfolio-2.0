@@ -9,8 +9,6 @@ import {
   AlertCircle, 
   ExternalLink, 
   Github, 
-  Zap, 
-  Sparkles, 
   ArrowRight 
 } from "lucide-react";
 
@@ -33,44 +31,22 @@ export default function Projects() {
             key={index}
             className="border border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl p-5 md:p-6 flex flex-col md:flex-row gap-6 items-stretch bg-white dark:bg-neutral-950/20 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-300"
           >
-            {/* Left: Screenshot wrapper */}
-            <div className={`relative w-full md:w-[42%] p-4 rounded-xl ${project.bgGradient} flex items-center justify-center min-h-[200px] md:min-h-0`}>
-              {/* Browser mockup wrapper */}
-              <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden border border-neutral-200 dark:border-white/10 shadow-2xl bg-neutral-950 flex flex-col">
-                {/* Browser top bar */}
-                <div className="h-7 bg-neutral-900 px-3 flex items-center justify-between border-b border-neutral-800 dark:border-white/5 select-none">
-                  {/* Left dots */}
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-[#ff5f56]" />
-                    <div className="w-2 h-2 rounded-full bg-[#ffbd2e]" />
-                    <div className="w-2 h-2 rounded-full bg-[#27c93f]" />
-                  </div>
-                  {/* Right small symbol */}
-                  {project.badgeType === "lightning" && (
-                    <Zap className="w-3 h-3 text-neutral-400 fill-neutral-400" />
-                  )}
-                  {project.badgeType === "spark" && (
-                    <Sparkles className="w-3 h-3 text-neutral-400 fill-neutral-400 animate-pulse" />
-                  )}
+            {/* Left: Image Container */}
+            <div className="relative w-full md:w-[42%] aspect-[16/10] rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800/80 shadow-lg bg-neutral-950 shrink-0">
+              <Image
+                src={project.src}
+                alt={project.name}
+                fill
+                sizes="(max-width: 768px) 100vw, 40vw"
+                className="object-cover object-top select-none"
+                priority={index === 0}
+              />
+              {/* Overlay badge */}
+              {project.badge && (
+                <div className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-black/80 backdrop-blur-md rounded-md text-[10px] md:text-xs font-semibold text-white border border-white/10 shadow-lg select-none">
+                  {project.badge}
                 </div>
-                {/* Browser body */}
-                <div className="relative flex-1 w-full bg-neutral-900 overflow-hidden">
-                  <Image
-                    src={project.src}
-                    alt={project.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 40vw"
-                    className="object-cover object-top select-none"
-                    priority={index === 0}
-                  />
-                  {/* Overlay badge */}
-                  {project.badge && (
-                    <div className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-black/80 backdrop-blur-md rounded-md text-[10px] md:text-xs font-semibold text-white border border-white/10 shadow-lg select-none">
-                      {project.badge}
-                    </div>
-                  )}
-                </div>
-              </div>
+              )}
             </div>
 
             {/* Right: Details */}
