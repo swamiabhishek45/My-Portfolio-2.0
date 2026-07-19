@@ -1,5 +1,6 @@
 import './globals.css';
 import { ThemeProvider } from "@/components/theme-provider";
+import { WordsPreloaderGate } from "@/components/words-preloader";
 import { Analytics } from "@vercel/analytics/next";
 import { GeistPixelGrid, GeistPixelSquare } from "geist/font/pixel";
 
@@ -25,8 +26,10 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
-            <Analytics />
+            <WordsPreloaderGate>
+              {children}
+              <Analytics />
+            </WordsPreloaderGate>
           </ThemeProvider>
         </body>
       </html>
