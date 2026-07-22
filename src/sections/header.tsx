@@ -125,10 +125,10 @@ export default function Header() {
               )}
               <span
                 className={`relative inline-flex rounded-full h-2 w-2 ${statusData
-                    ? isCoding
-                      ? "bg-green-500"
-                      : "bg-neutral-400 dark:bg-neutral-600"
-                    : "bg-neutral-300 dark:bg-neutral-700"
+                  ? isCoding
+                    ? "bg-green-500"
+                    : "bg-neutral-400 dark:bg-neutral-600"
+                  : "bg-neutral-300 dark:bg-neutral-700"
                   }`}
               ></span>
             </span>

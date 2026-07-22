@@ -341,6 +341,14 @@ export default function ScannerAvatar({
           pointerEvents: "none",
         }}
       />
+
+      {/* Cyber Katana Overlay */}
+      {/* <img
+        src="/cyber_katana.png"
+        alt="Cyber Katana Overlay"
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"
+        draggable={false}
+      /> */}
     </motion.div>
   );
 }
