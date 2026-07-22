@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { projects } from "@/data/projects";
 import Link from "next/link";
 import Image from "next/image";
@@ -7,13 +8,31 @@ import {
   Lock, 
   Settings, 
   AlertCircle, 
-  ExternalLink, 
-  Github, 
-  ArrowRight 
+  ExternalLink 
 } from "lucide-react";
+import { ArrowRightIcon, type ArrowRightIconHandle } from "@/components/ui/arrow-right";
+import { GithubIcon, type GithubIconHandle } from "@/components/ui/github";
+
+const ProjectGithubLink = ({ href }: { href: string }) => {
+  const iconRef = useRef<GithubIconHandle>(null);
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      onMouseEnter={() => iconRef.current?.startAnimation()}
+      onMouseLeave={() => iconRef.current?.stopAnimation()}
+      className="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-xs font-bold text-neutral-700 dark:text-neutral-200 rounded-md transition-colors whitespace-nowrap shadow-sm"
+    >
+      <GithubIcon ref={iconRef} size={14} className="shrink-0" />
+      GitHub
+    </a>
+  );
+};
 
 export default function Projects() {
   const proj = projects;
+  const arrowRef = useRef<ArrowRightIconHandle>(null);
 
   return (
     <section className="flex flex-col w-full">
@@ -80,15 +99,7 @@ export default function Projects() {
                       <ExternalLink className="w-3 h-3" />
                       Live
                     </a>
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-xs font-bold text-neutral-700 dark:text-neutral-200 rounded-md transition-colors whitespace-nowrap shadow-sm"
-                    >
-                      <Github className="w-3.5 h-3.5" />
-                      GitHub
-                    </a>
+                    <ProjectGithubLink href={project.github} />
                   </div>
                 </div>
 
@@ -124,8 +135,10 @@ export default function Projects() {
         <Link
           href="/projects"
           className="inline-flex items-center gap-2 px-3 py-1.5 border border-dashed border-neutral-300 dark:border-neutral-700/60 rounded-lg text-sm text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 hover:border-neutral-400 dark:hover:border-neutral-500 transition-colors select-none"
+          onMouseEnter={() => arrowRef.current?.startAnimation()}
+          onMouseLeave={() => arrowRef.current?.stopAnimation()}
         >
-          More Projects <ArrowRight className="w-4 h-4" />
+          More Projects <ArrowRightIcon ref={arrowRef} size={16} className="shrink-0" />
         </Link>
       </div>
     </section>
