@@ -1,14 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import useSWR from "swr";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import ScannerAvatar from "@/components/ui/scanner-avatar";
 import CountUp from "@/components/ui/count-up";
 import { Eye, BadgeCheck, Globe } from "lucide-react";
+import { motion, useInView } from "motion/react";
+import { TextFlip } from "@/components/text-flip";
+
+const WORDS = ["Developer", "Engineer", "Learner"];
 
 export default function Header() {
   const [visitorCount, setVisitorCount] = useState<number | null>(null);
+  const [wordIndex, setWordIndex] = useState(0);
+
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref);
+  const play = isInView;
 
   const { data: statusData } = useSWR(
     "/api/wakatime",
@@ -42,6 +51,8 @@ export default function Header() {
     }
     fetchVisitorCount();
   }, []);
+
+  const article = WORDS[wordIndex] === "Engineer" ? "an" : "a";
 
   return (
     <section className="border border-neutral-200 dark:border-neutral-800/80 p-5 sm:p-6 rounded-2xl bg-neutral-50/30 dark:bg-neutral-900/20 relative overflow-hidden transition-all duration-300">
@@ -83,8 +94,26 @@ export default function Header() {
           </div>
 
           {/* Subtitles */}
-          <div className="text-sm sm:text-base font-medium text-neutral-600 dark:text-neutral-400 mb-2">
-            22 • Full Stack Developer
+          <div
+            ref={ref}
+            className="text-sm sm:text-base font-medium text-neutral-600 dark:text-neutral-400 mb-2 flex items-center justify-center sm:justify-start gap-1.5 h-6 select-none"
+          >
+            <span>22 • I am {article}</span>
+            <span className="inline-grid text-neutral-900 dark:text-neutral-50 font-semibold font-sans">
+              <span className="invisible col-start-1 row-start-1" aria-hidden>
+                {WORDS.reduce((a, b) => (a.length >= b.length ? a : b))}
+              </span>
+              <TextFlip
+                as={motion.span}
+                className="col-start-1 row-start-1 text-neutral-900 dark:text-neutral-50"
+                play={play}
+                onIndexChange={setWordIndex}
+              >
+                {WORDS.map((word) => (
+                  <span key={word}>{word}</span>
+                ))}
+              </TextFlip>
+            </span>
           </div>
 
           {/* Status Bar */}
