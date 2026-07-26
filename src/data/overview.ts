@@ -21,7 +21,7 @@ export const overviewData: OverviewData = {
     { title: "Full stack Developer", iconName: "code" }
   ],
   location: "Pune, Maharashtra, India",
-  phone: "+91 89560 08591",
+  phone: "+91 8956* *****",
   phoneRaw: "tel:+918956008591",
   email: "abhishekswami1435@gmail.com",
   website: "swamiabhishek.online",
