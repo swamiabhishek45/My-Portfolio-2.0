@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { WordsPreloaderGate } from "@/components/words-preloader";
 import { Analytics } from "@vercel/analytics/next";
 import { GeistPixelGrid, GeistPixelSquare } from "geist/font/pixel";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export default function RootLayout({
   children,
@@ -26,10 +27,12 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <WordsPreloaderGate>
-              {children}
-              <Analytics />
-            </WordsPreloaderGate>
+            <TooltipProvider>
+              <WordsPreloaderGate>
+                {children}
+                <Analytics />
+              </WordsPreloaderGate>
+            </TooltipProvider>
           </ThemeProvider>
         </body>
       </html>

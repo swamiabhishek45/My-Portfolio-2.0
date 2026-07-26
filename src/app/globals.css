@@ -414,3 +414,7 @@
 .animate-scanner-shake-light {
   animation: scanner-shake-light 0.08s infinite;
 }
+
+@utility link-underline {
+    @apply underline decoration-current/30 decoration-1 underline-offset-3 transition-colors hover:decoration-current;
+}

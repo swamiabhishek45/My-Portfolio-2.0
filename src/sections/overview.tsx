@@ -1,14 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Code2, Lightbulb, MapPin, Phone, Mail, Link2, Clock, User, Globe } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { Lightbulb, User, Globe } from "lucide-react";
 import { overviewData } from "@/data/overview";
 import SocialLinks from "@/components/social-links";
+import { MapPinIcon } from "@/components/ui/map-pin";
+import { PhoneIcon } from "@/components/ui/phone";
+import { AtSignIcon } from "@/components/ui/at-sign";
+import { LinkIcon } from "@/components/ui/link";
+import { ClockIcon } from "@/components/ui/clock";
+import { FolderCodeIcon } from "@/components/ui/folder-code";
 
 const getIconComponent = (name: string) => {
   switch (name) {
     case "code":
-      return Code2;
+      return FolderCodeIcon;
     case "lightbulb":
       return Lightbulb;
     case "user":
@@ -16,7 +22,7 @@ const getIconComponent = (name: string) => {
     case "globe":
       return Globe;
     default:
-      return Code2;
+      return FolderCodeIcon;
   }
 };
 
@@ -39,12 +45,43 @@ const MaleIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-const OverviewIcon = ({ icon: Icon }: { icon: React.ComponentType<any> }) => {
+const OverviewIcon = ({
+  icon: Icon,
+  size = 16,
+  iconRef,
+}: {
+  icon: React.ComponentType<any>;
+  size?: number;
+  iconRef?: any;
+}) => {
   return (
     <div className="w-9 h-9 flex items-center justify-center rounded-[14px] border border-[#e4e4e7] dark:border-[#1f1f23] bg-[#f8f8fa] dark:bg-[#141416] p-[2px] shrink-0">
       <div className="w-full h-full flex items-center justify-center rounded-[10px] border border-[#d4d4d8] dark:border-[#2e2e33] bg-[#ededf0] dark:bg-[#1c1c1f]">
-        <Icon className="w-[16px] h-[16px] text-[#5c5e66] dark:text-[#a1a1aa]" />
+        <Icon ref={iconRef} size={size} className="text-[#5c5e66] dark:text-[#a1a1aa]" />
       </div>
+    </div>
+  );
+};
+
+const RoleItem = ({ role }: { role: typeof overviewData.roles[0] }) => {
+  const iconRef = useRef<any>(null);
+  const RoleIcon = getIconComponent(role.iconName);
+
+  return (
+    <div
+      className="flex items-center gap-3 cursor-default animate-once"
+      onMouseEnter={() => iconRef.current?.startAnimation?.()}
+      onMouseLeave={() => iconRef.current?.stopAnimation?.()}
+    >
+      <OverviewIcon icon={RoleIcon} iconRef={iconRef} />
+      <span className="text-neutral-800 dark:text-neutral-200 font-semibold text-sm sm:text-base">
+        {role.title}{" "}
+        {role.company && (
+          <span className="text-neutral-500 dark:text-neutral-400 font-medium">
+            @{role.company}
+          </span>
+        )}
+      </span>
     </div>
   );
 };
@@ -52,6 +89,12 @@ const OverviewIcon = ({ icon: Icon }: { icon: React.ComponentType<any> }) => {
 export default function Overview() {
   const [time, setTime] = useState("");
   const [timeDiff, setTimeDiff] = useState("");
+
+  const mapPinRef = useRef<any>(null);
+  const phoneRef = useRef<any>(null);
+  const linkRef = useRef<any>(null);
+  const clockRef = useRef<any>(null);
+  const emailRef = useRef<any>(null);
 
   useEffect(() => {
     const updateTime = () => {
@@ -104,21 +147,17 @@ export default function Overview() {
           {/* Left Column */}
           <div className="flex flex-col gap-4">
             {/* Roles */}
-            {overviewData.roles.map((role, idx) => {
-              const RoleIcon = getIconComponent(role.iconName);
-              return (
-                <div key={idx} className="flex items-center gap-3">
-                  <OverviewIcon icon={RoleIcon} />
-                  <span className="text-neutral-800 dark:text-neutral-200 font-semibold text-sm sm:text-base">
-                    {role.title} {role.company && <span className="text-neutral-500 dark:text-neutral-400 font-medium">@{role.company}</span>}
-                  </span>
-                </div>
-              );
-            })}
+            {overviewData.roles.map((role, idx) => (
+              <RoleItem key={idx} role={role} />
+            ))}
 
             {/* Location */}
-            <div className="flex items-center gap-3">
-              <OverviewIcon icon={MapPin} />
+            <div
+              className="flex items-center gap-3 cursor-default"
+              onMouseEnter={() => mapPinRef.current?.startAnimation()}
+              onMouseLeave={() => mapPinRef.current?.stopAnimation()}
+            >
+              <OverviewIcon icon={MapPinIcon} iconRef={mapPinRef} />
               <span className="text-neutral-800 dark:text-neutral-200 font-medium text-sm sm:text-base">
                 {overviewData.location}
               </span>
@@ -126,9 +165,11 @@ export default function Overview() {
 
             {/* Phone */}
             <div className="flex items-center gap-3">
-              <OverviewIcon icon={Phone} />
+              <OverviewIcon icon={PhoneIcon} iconRef={phoneRef} />
               <a
                 href={overviewData.phoneRaw}
+                onMouseEnter={() => phoneRef.current?.startAnimation()}
+                onMouseLeave={() => phoneRef.current?.stopAnimation()}
                 className="text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white font-medium text-sm sm:text-base transition-colors"
               >
                 {overviewData.phone}
@@ -137,11 +178,13 @@ export default function Overview() {
 
             {/* Website */}
             <div className="flex items-center gap-3">
-              <OverviewIcon icon={Link2} />
+              <OverviewIcon icon={LinkIcon} iconRef={linkRef} />
               <a
                 href={overviewData.websiteRaw}
                 target="_blank"
                 rel="noopener noreferrer"
+                onMouseEnter={() => linkRef.current?.startAnimation()}
+                onMouseLeave={() => linkRef.current?.stopAnimation()}
                 className="text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white font-medium text-sm sm:text-base transition-colors"
               >
                 {overviewData.website}
@@ -155,8 +198,12 @@ export default function Overview() {
             <div className="hidden md:block h-8" />
 
             {/* Local Time */}
-            <div className="flex items-center gap-3">
-              <OverviewIcon icon={Clock} />
+            <div
+              className="flex items-center gap-3 cursor-default"
+              onMouseEnter={() => clockRef.current?.startAnimation()}
+              onMouseLeave={() => clockRef.current?.stopAnimation()}
+            >
+              <OverviewIcon icon={ClockIcon} iconRef={clockRef} />
               <span className="text-neutral-800 dark:text-neutral-200 font-medium text-sm sm:text-base">
                 {time || "00:00"} <span className="text-neutral-500 dark:text-neutral-400 font-normal">// {timeDiff}</span>
               </span>
@@ -164,9 +211,11 @@ export default function Overview() {
 
             {/* Email */}
             <div className="flex items-center gap-3">
-              <OverviewIcon icon={Mail} />
+              <OverviewIcon icon={AtSignIcon} iconRef={emailRef} />
               <a
                 href={`mailto:${overviewData.email}`}
+                onMouseEnter={() => emailRef.current?.startAnimation()}
+                onMouseLeave={() => emailRef.current?.stopAnimation()}
                 className="text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white font-medium text-sm sm:text-base transition-colors break-all"
               >
                 {overviewData.email}

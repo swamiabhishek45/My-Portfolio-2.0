@@ -4,7 +4,8 @@ import * as React from "react"
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react"
-import { ArrowLeft, ArrowRight } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
+import { ArrowRightIcon, type ArrowRightIconHandle } from "@/components/ui/arrow-right"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -208,6 +209,7 @@ function CarouselNext({
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { orientation, scrollNext, canScrollNext } = useCarousel()
+  const arrowRef = React.useRef<ArrowRightIconHandle>(null)
 
   return (
     <Button
@@ -223,9 +225,11 @@ function CarouselNext({
       )}
       disabled={!canScrollNext}
       onClick={scrollNext}
+      onMouseEnter={() => arrowRef.current?.startAnimation()}
+      onMouseLeave={() => arrowRef.current?.stopAnimation()}
       {...props}
     >
-      <ArrowRight />
+      <ArrowRightIcon ref={arrowRef} size={16} className="shrink-0" />
       <span className="sr-only">Next slide</span>
     </Button>
   )
