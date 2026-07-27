@@ -5,6 +5,7 @@ import Header from "@/sections/header";
 import Overview from "@/sections/overview";
 import About from "@/sections/about";
 import Technologies from "@/sections/technologies";
+import ParticleTypographyDense from "@/sections/particle-typography";
 
 export default function Page() {
   return (
@@ -16,6 +17,8 @@ export default function Page() {
       <Projects />
       <GitHub />
       <Contact />
+      <ParticleTypographyDense />
     </div>
   );
 }
+
