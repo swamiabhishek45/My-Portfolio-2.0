@@ -3,42 +3,40 @@ import { Badge } from "@/components/ui/badge";
 
 export default function Technologies() {
   return (
-    <section className="border p-5 rounded-lg space-y-6">
-      <h2 className="text-xl font-semibold mb-3 border-b border-neutral-400 pb-1">
-        Technologies
-      </h2>
-
-      {techCategories.map((category, idx) => (
-        <div key={idx}>
-          <h3 className="text-lg font-medium mb-3 text-neutral-600 dark:text-neutral-400">
-            {category.name}
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {category.items.map((tech, index) => {
-              const Icon = tech.icon;
-              return (
-                <Badge
-                  key={index}
-                  variant="outline"
-                  className="
-                    border-neutral-700
-                    text-neutral-800 dark:text-neutral-100
-                    hover:bg-neutral-200 dark:hover:bg-neutral-800
-                    transition
-                    flex items-center gap-2 p-2
-                  "
-                >
-                  <span className="text-lg">
-                    <Icon />
-                  </span>
-                  <span>{tech.name}</span>
-                </Badge>
-              );
-            })}
+    <section className="flex flex-col w-full">
+      <div className="border border-dotted border-neutral-300 dark:border-neutral-800/80 p-5 sm:p-6 rounded-2xl space-y-6 bg-neutral-50/10 dark:bg-neutral-900/10">
+        {techCategories.map((category, idx) => (
+          <div key={idx} className="space-y-3">
+            <h3 className="text-xs font-mono font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+              {category.name}
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {category.items.map((tech, index) => {
+                const Icon = tech.icon;
+                return (
+                  <Badge
+                    key={index}
+                    variant="outline"
+                    className="
+                      border-dotted border-neutral-300 dark:border-neutral-800
+                      text-neutral-800 dark:text-neutral-100
+                      bg-white/50 dark:bg-neutral-950/40
+                      hover:bg-neutral-200 dark:hover:bg-neutral-800
+                      transition-all
+                      flex items-center gap-2 px-3 py-1.5 text-xs font-mono
+                    "
+                  >
+                    <span className="text-sm">
+                      <Icon />
+                    </span>
+                    <span>{tech.name}</span>
+                  </Badge>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </section>
   );
 }
-

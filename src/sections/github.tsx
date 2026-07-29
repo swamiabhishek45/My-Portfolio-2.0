@@ -12,23 +12,21 @@ export default function GitHub() {
   const contributions = getCachedContributions(GITHUB_USERNAME);
 
   return (
-    <section className="border p-5 rounded-lg">
-      <h2 className="text-xl font-semibold border-b border-neutral-400 mb-3">
-        GitHub Contributions
-      </h2>
+    <section className="flex flex-col w-full">
+      <div className="border border-dotted border-neutral-300 dark:border-neutral-800/80 p-5 rounded-2xl bg-neutral-50/10 dark:bg-neutral-900/10">
+        <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4 font-mono">
+          // Tracking my GitHub contributions and open-source activity over the past year.
+        </p>
 
-      <p className="text-sm text-neutral-700 dark:text-neutral-300 mt-2 mb-4">
-        Tracking my GitHub contributions and open-source activity over the past year.
-      </p>
-
-      {/* The Calendar */}
-      <div className="github-calendar-wrapper w-full flex justify-center">
-        <Suspense fallback={<GitHubContributionsFallback />}>
-          <GitHubContributions
-            contributions={contributions}
-            githubProfileUrl={GITHUB_PROFILE_URL}
-          />
-        </Suspense>
+        {/* The Calendar */}
+        <div className="github-calendar-wrapper w-full flex justify-center">
+          <Suspense fallback={<GitHubContributionsFallback />}>
+            <GitHubContributions
+              contributions={contributions}
+              githubProfileUrl={GITHUB_PROFILE_URL}
+            />
+          </Suspense>
+        </div>
       </div>
     </section>
   );

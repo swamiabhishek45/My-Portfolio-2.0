@@ -36,19 +36,12 @@ export default function Projects() {
 
   return (
     <section className="flex flex-col w-full">
-      {/* Title */}
-      <div className="flex justify-start mb-6">
-        <div className="inline-flex items-center px-3 py-1 border border-dashed border-neutral-300 dark:border-neutral-700/60 rounded-md text-sm font-medium text-neutral-600 dark:text-neutral-300 select-none bg-neutral-50 dark:bg-neutral-900/20">
-          My Projects
-        </div>
-      </div>
-
       {/* Projects List */}
       <div className="flex flex-col gap-6">
         {proj.map((project, index) => (
           <div
             key={index}
-            className="border border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl p-5 md:p-6 flex flex-col md:flex-row gap-6 items-stretch bg-white dark:bg-neutral-950/20 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-300"
+            className="border border-dotted border-neutral-300 dark:border-neutral-800 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row gap-6 items-stretch bg-white/40 dark:bg-neutral-950/20 hover:border-neutral-400 dark:hover:border-neutral-700 transition-all duration-300"
           >
             {/* Left: Image Container */}
             <div className="relative w-full md:w-[42%] aspect-[16/10] rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800/80 shadow-lg bg-neutral-950 shrink-0">

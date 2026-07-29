@@ -57,7 +57,7 @@ const OverviewIcon = ({
   return (
     <div className="w-9 h-9 flex items-center justify-center rounded-[14px] border border-[#e4e4e7] dark:border-[#1f1f23] bg-[#f8f8fa] dark:bg-[#141416] p-[2px] shrink-0">
       <div className="w-full h-full flex items-center justify-center rounded-[10px] border border-[#d4d4d8] dark:border-[#2e2e33] bg-[#ededf0] dark:bg-[#1c1c1f]">
-        <Icon ref={iconRef} size={size} className="text-[#5c5e66] dark:text-[#a1a1aa]" />
+        <Icon ref={iconRef} size={size} className="text-neutral-800 dark:text-[#a1a1aa]" />
       </div>
     </div>
   );
@@ -74,10 +74,10 @@ const RoleItem = ({ role }: { role: typeof overviewData.roles[0] }) => {
       onMouseLeave={() => iconRef.current?.stopAnimation?.()}
     >
       <OverviewIcon icon={RoleIcon} iconRef={iconRef} />
-      <span className="text-neutral-800 dark:text-neutral-200 font-semibold text-sm sm:text-base">
+      <span className="text-neutral-900 dark:text-neutral-200 font-semibold text-sm sm:text-base">
         {role.title}{" "}
         {role.company && (
-          <span className="text-neutral-500 dark:text-neutral-400 font-medium">
+          <span className="text-neutral-700 dark:text-neutral-400 font-medium">
             @{role.company}
           </span>
         )}
@@ -138,11 +138,11 @@ export default function Overview() {
   return (
     <section className="flex flex-col w-full">
       {/* Outer Card Wrapper */}
-      <div className="border border-neutral-200 dark:border-neutral-800/80 rounded-2xl bg-neutral-50/10 dark:bg-neutral-900/10 overflow-hidden font-mono">
+      <div className="border border-dotted border-neutral-300 dark:border-neutral-800/80 rounded-2xl bg-neutral-50/10 dark:bg-neutral-900/10 overflow-hidden font-mono">
         {/* Columns Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 p-5 gap-y-4 relative">
           {/* Dashed vertical separator (visible on md+) */}
-          <div className="hidden md:block absolute top-5 bottom-5 left-1/2 -translate-x-1/2 border-r border-dashed border-neutral-200 dark:border-neutral-800/80" />
+          <div className="hidden md:block absolute top-5 bottom-5 left-1/2 -translate-x-1/2 border-r border-dotted border-neutral-300 dark:border-neutral-800/80" />
 
           {/* Left Column */}
           <div className="flex flex-col gap-4">

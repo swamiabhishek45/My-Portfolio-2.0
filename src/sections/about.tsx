@@ -40,9 +40,9 @@ export default function About() {
       </h2>
 
       {/* Outer Card */}
-      <div className="border border-neutral-200 dark:border-neutral-800/80 p-4 rounded-2xl bg-neutral-50/10 dark:bg-neutral-900/10">
+      <div className="border border-dotted border-neutral-300 dark:border-neutral-800/80 p-4 rounded-2xl bg-neutral-50/10 dark:bg-neutral-900/10">
         {/* Inner Card */}
-        <div className="border border-neutral-200/60 dark:border-neutral-800/60 p-5 rounded-xl bg-white/40 dark:bg-black/50 backdrop-blur-xs flex flex-col gap-4">
+        <div className="border border-dotted border-neutral-200/80 dark:border-neutral-800/60 p-5 rounded-xl bg-white/40 dark:bg-black/50 backdrop-blur-xs flex flex-col gap-4">
           <ul className="flex flex-col gap-3.5">
             {/* Always Visible Bullets */}
             {visibleBullets.map((bullet, index) => (

@@ -5,7 +5,7 @@ import useSWR from "swr";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import ScannerAvatar from "@/components/ui/scanner-avatar";
 import CountUp from "@/components/ui/count-up";
-import { Eye, BadgeCheck, Globe } from "lucide-react";
+import { Eye, BadgeCheck } from "lucide-react";
 import { motion, useInView } from "motion/react";
 import { TextFlip } from "@/components/text-flip";
 
@@ -14,8 +14,10 @@ const WORDS = ["Developer", "Engineer", "Learner"];
 export default function Header() {
   const [visitorCount, setVisitorCount] = useState<number | null>(null);
   const [wordIndex, setWordIndex] = useState(0);
+  const [currentTime, setCurrentTime] = useState("");
 
   const ref = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const isInView = useInView(ref);
   const play = isInView;
 
@@ -31,7 +33,7 @@ export default function Header() {
     ? isCoding
       ? `Cooking in ${editor}`
       : "Idle · Reading books"
-    : "Loading status...";
+    : "Cooking in Antigravity";
 
   const activeTimeText = statusData?.activeTimeToday
     ? ` • ${statusData.activeTimeToday} active today`
@@ -52,88 +54,209 @@ export default function Header() {
     fetchVisitorCount();
   }, []);
 
+  useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
+      setCurrentTime(`${hours}:${minutes}:${seconds}`);
+    };
+    updateClock();
+    const timer = setInterval(updateClock, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animationFrameId: number;
+    let width = canvas.width;
+    let height = canvas.height;
+
+    const handleResize = () => {
+      if (canvas.parentElement) {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        width = canvas.width;
+        height = canvas.height;
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    const numParticles = 40;
+    const particles = Array.from({ length: numParticles }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      size: Math.random() * 1.5 + 0.5,
+      speedX: (Math.random() - 0.5) * 0.3,
+      speedY: (Math.random() - 0.5) * 0.3,
+      opacity: Math.random() * 0.6 + 0.2,
+    }));
+
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      particles.forEach((p) => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
   const article = WORDS[wordIndex] === "Engineer" ? "an" : "a";
 
   return (
-    <section className="border border-neutral-200 dark:border-neutral-800/80 p-5 sm:p-6 rounded-2xl bg-neutral-50/30 dark:bg-neutral-900/20 relative overflow-hidden transition-all duration-300">
-      {/* Top Right Controls: Visitor Count & Theme Toggler */}
-      <div className="absolute top-4 right-4 sm:top-5 sm:right-5 flex items-center gap-4 z-20">
-        {visitorCount !== null && (
-          <div className="flex items-center gap-1.5 text-xs font-mono text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800/50 px-2 py-1 rounded-md border border-neutral-200/50 dark:border-neutral-800/30">
-            <Eye className="w-3.5 h-3.5" />
-            <CountUp end={visitorCount} duration={2} />
-          </div>
-        )}
-        <AnimatedThemeToggler />
+    <section className="border border-dotted border-neutral-300 dark:border-neutral-800/80 rounded-2xl bg-neutral-50/20 dark:bg-neutral-900/20 relative overflow-hidden transition-all duration-300 flex flex-col">
+      {/* Top Panoramic Hero Banner */}
+      <div className="relative w-full h-40 sm:h-48 overflow-hidden border-b border-dotted border-neutral-300 dark:border-neutral-800/80 group">
+        <img
+          src="/banner.png"
+          alt="Header Banner"
+          className="w-full h-full object-cover object-center filter brightness-95 dark:brightness-90 transition-transform duration-700 group-hover:scale-105"
+        />
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full pointer-events-none z-[4]"
+          width={491}
+          height={200}
+        />
+        {/* Pixel Art Overlay Clock at Bottom Right */}
+        <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded border border-neutral-700/50 text-xs font-mono text-neutral-300 shadow-sm flex items-center gap-1.5 select-none z-10">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span>{currentTime || "16:50:55"}</span>
+        </div>
       </div>
 
       {/* Main Profile Info */}
-      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6 mt-4 sm:mt-0">
-        {/* Avatar */}
-        <ScannerAvatar
-          primaryImage="/avatar.png"
-          secondaryImage="/photo.png"
-          interval={3000}
-          duration={650}
-          className="w-24 h-24 sm:w-28 sm:h-28 border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 shrink-0 shadow-sm"
-        />
+      <div className="p-5 sm:p-6 flex flex-col gap-5">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-4 sm:gap-6">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 text-center sm:text-left">
+            {/* Avatar */}
+            <ScannerAvatar
+              primaryImage="/avatar.png"
+              secondaryImage="/photo.png"
+              interval={3000}
+              duration={650}
+              className="w-16 h-16 sm:w-20 sm:h-20 border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 shrink-0 shadow-sm rounded-xl"
+            />
 
-        {/* Details */}
-        <div className="flex flex-col items-center sm:items-start text-center sm:text-left justify-center h-full sm:pt-2">
-          {/* Top small icon */}
-          <div className="mb-1 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-400 transition-colors">
-            <Globe className="w-4 h-4 animate-[spin_20s_linear_infinite]" />
-          </div>
+            {/* Details */}
+            <div className="flex flex-col items-center sm:items-start justify-center gap-1.5">
+              {/* Name & Verified Check Badge */}
+              <div className="flex items-center gap-1.5">
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 font-sans leading-tight">
+                  Abhishek Swami
+                </h1>
+                <BadgeCheck className="w-4.5 h-4.5 text-blue-500 fill-blue-500 dark:fill-blue-500 stroke-neutral-50 dark:stroke-neutral-900 shrink-0" />
+              </div>
 
-          {/* Name & Verified Badge */}
-          <div className="flex items-center gap-1.5 mb-1">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 font-sans">
-              Abhishek Swami
-            </h1>
-            <BadgeCheck className="w-5 h-5 text-blue-500 fill-blue-500 dark:fill-blue-500 stroke-neutral-50 dark:stroke-neutral-900 shrink-0" />
-          </div>
-
-          {/* Subtitles */}
-          <div
-            ref={ref}
-            className="text-sm sm:text-base font-medium text-neutral-600 dark:text-neutral-400 mb-2 flex items-center justify-center sm:justify-start gap-1.5 h-6 select-none"
-          >
-            <span>22 • I am {article}</span>
-            <span className="inline-grid text-neutral-900 dark:text-neutral-50 font-semibold font-sans">
-              <span className="invisible col-start-1 row-start-1" aria-hidden>
-                {WORDS.reduce((a, b) => (a.length >= b.length ? a : b))}
-              </span>
-              <TextFlip
-                as={motion.span}
-                className="col-start-1 row-start-1 text-neutral-900 dark:text-neutral-50"
-                play={play}
-                onIndexChange={setWordIndex}
+              {/* Subtitle with TextFlip */}
+              <div
+                ref={ref}
+                className="text-xs sm:text-sm font-medium text-neutral-800 dark:text-neutral-400 flex items-center justify-center sm:justify-start gap-1.5 h-5 select-none font-mono"
               >
-                {WORDS.map((word) => (
-                  <span key={word}>{word}</span>
-                ))}
-              </TextFlip>
-            </span>
+                <span>22 • I am {article}</span>
+                <span className="inline-grid text-neutral-900 dark:text-neutral-50 font-semibold font-mono">
+                  <span className="invisible col-start-1 row-start-1" aria-hidden>
+                    {WORDS.reduce((a, b) => (a.length >= b.length ? a : b))}
+                  </span>
+                  <TextFlip
+                    as={motion.span}
+                    className="col-start-1 row-start-1 text-neutral-900 dark:text-neutral-50"
+                    play={play}
+                    onIndexChange={setWordIndex}
+                  >
+                    {WORDS.map((word) => (
+                      <span key={word}>{word}</span>
+                    ))}
+                  </TextFlip>
+                </span>
+              </div>
+
+              {/* Wakatime / Activity Status Bar */}
+              <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-neutral-700 dark:text-neutral-400 h-4 font-mono font-medium">
+                <span className="relative flex h-2 w-2">
+                  {(!statusData || isCoding) && (
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  )}
+                  <span
+                    className={`relative inline-flex rounded-full h-2 w-2 ${statusData
+                        ? isCoding
+                          ? "bg-green-500"
+                          : "bg-neutral-400 dark:bg-neutral-600"
+                        : "bg-green-500"
+                      }`}
+                  ></span>
+                </span>
+                <span>{statusText}{activeTimeText}</span>
+              </div>
+            </div>
           </div>
 
-          {/* Status Bar */}
-          <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400 h-5">
-            <span className="relative flex h-2 w-2">
-              {(!statusData || isCoding) && (
-                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isCoding ? "bg-green-400" : "bg-neutral-400 dark:bg-neutral-600 opacity-75"
-                  }`}></span>
-              )}
-              <span
-                className={`relative inline-flex rounded-full h-2 w-2 ${statusData
-                  ? isCoding
-                    ? "bg-green-500"
-                    : "bg-neutral-400 dark:bg-neutral-600"
-                  : "bg-neutral-300 dark:bg-neutral-700"
-                  }`}
-              ></span>
-            </span>
-            <span>{statusText}{activeTimeText}</span>
+          {/* Top Right Controls: Visitor Count & Theme Toggler */}
+          <div className="flex items-center gap-2.5 self-end sm:self-start z-10 shrink-0">
+            {visitorCount !== null && (
+              <div className="flex items-center gap-1.5 text-xs font-mono text-neutral-700 dark:text-neutral-400 font-medium bg-neutral-100 dark:bg-neutral-800/60 px-2.5 py-1.5 rounded-lg border border-dotted border-neutral-300 dark:border-neutral-700">
+                <Eye className="w-3.5 h-3.5" />
+                <CountUp end={visitorCount} duration={2} />
+              </div>
+            )}
+            <div className="border border-dotted border-neutral-300 dark:border-neutral-700 rounded-lg p-1 bg-neutral-100 dark:bg-neutral-800/60">
+              <AnimatedThemeToggler />
+            </div>
           </div>
+        </div>
+
+        {/* Bio Tagline & Bullet List */}
+        <div className="flex flex-col gap-3 pt-3 border-t border-dotted border-neutral-200 dark:border-neutral-800/80">
+          <p className="text-sm sm:text-base font-medium text-neutral-900 dark:text-neutral-200 leading-relaxed font-sans">
+            Engineer / Artist. I love building, breaking, and shipping things.
+          </p>
+
+          <ul className="flex flex-col gap-2 text-xs sm:text-sm text-neutral-700 dark:text-neutral-400 font-sans leading-relaxed">
+            <li className="flex items-start gap-2">
+              <span className="text-neutral-500 dark:text-neutral-500 select-none">•</span>
+              <span>
+                <strong className="text-neutral-900 dark:text-neutral-200 font-semibold">AI, open source,</strong> and developer tools excite me.
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-neutral-500 dark:text-neutral-500 select-none">•</span>
+              <span>
+                I believe actions speak louder than words, so I put my code where my mouth is.
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-neutral-500 dark:text-neutral-500 select-none">•</span>
+              <span>
+                Currently building <strong className="text-neutral-900 dark:text-neutral-200 font-semibold">high-performance web products, VengeanceUI,</strong> and experimental AI tools.
+              </span>
+            </li>
+          </ul>
         </div>
       </div>
     </section>
