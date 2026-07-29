@@ -9,7 +9,7 @@ import { DottedGridSection } from "@/components/ui/dotted-grid";
 
 export default function Page() {
   return (
-    <main className="min-h-screen bg-background text-neutral-900 dark:text-neutral-100 transition-colors py-6 sm:py-10 overflow-x-hidden">
+    <main className="min-h-screen bg-background text-neutral-900 dark:text-neutral-100 transition-colors py-6 sm:py-10 overflow-x-clip">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 flex gap-6 lg:gap-8 justify-center">
 
         {/* Main Content Column with Full-Bleed Dotted Grid Lines */}

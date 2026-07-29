@@ -38,12 +38,12 @@ export function DottedGridSection({
 
       {/* Full-height Left Vertical Dotted Line */}
       {showLeftLine && (
-        <div className="absolute top-[-2000px] bottom-[-2000px] left-0 w-[1px] bg-[linear-gradient(to_bottom,rgba(160,160,160,0.25)_50%,transparent_0%)] dark:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.12)_50%,transparent_0%)] bg-[length:1px_4px] bg-repeat-y pointer-events-none z-10" />
+        <div className="absolute top-[-12px] bottom-[-12px] left-0 w-[1px] bg-[linear-gradient(to_bottom,rgba(160,160,160,0.25)_50%,transparent_0%)] dark:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.12)_50%,transparent_0%)] bg-[length:1px_4px] bg-repeat-y pointer-events-none z-10" />
       )}
 
       {/* Full-height Right Vertical Dotted Line */}
       {showRightLine && (
-        <div className="absolute top-[-2000px] bottom-[-2000px] right-0 w-[1px] bg-[linear-gradient(to_bottom,rgba(160,160,160,0.25)_50%,transparent_0%)] dark:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.12)_50%,transparent_0%)] bg-[length:1px_4px] bg-repeat-y pointer-events-none z-10" />
+        <div className="absolute top-[-12px] bottom-[-12px] right-0 w-[1px] bg-[linear-gradient(to_bottom,rgba(160,160,160,0.25)_50%,transparent_0%)] dark:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.12)_50%,transparent_0%)] bg-[length:1px_4px] bg-repeat-y pointer-events-none z-10" />
       )}
 
       {/* Grid Intersection Corner Markers */}

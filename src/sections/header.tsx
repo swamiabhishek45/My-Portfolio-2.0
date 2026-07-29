@@ -234,26 +234,26 @@ export default function Header() {
         {/* Bio Tagline & Bullet List */}
         <div className="flex flex-col gap-3 pt-3 border-t border-dotted border-neutral-200 dark:border-neutral-800/80">
           <p className="text-sm sm:text-base font-medium text-neutral-900 dark:text-neutral-200 leading-relaxed font-sans">
-            Engineer / Artist. I love building, breaking, and shipping things.
+          Full Stack Developer. I love building, breaking, and shipping things.
           </p>
 
           <ul className="flex flex-col gap-2 text-xs sm:text-sm text-neutral-700 dark:text-neutral-400 font-sans leading-relaxed">
             <li className="flex items-start gap-2">
               <span className="text-neutral-500 dark:text-neutral-500 select-none">•</span>
-              <span>
-                <strong className="text-neutral-900 dark:text-neutral-200 font-semibold">AI, open source,</strong> and developer tools excite me.
+              <span>Skilled in
+                <strong className="text-neutral-900 dark:text-neutral-200 font-semibold"> Next.js, React, JavaScript, Node.js, & MongoDB.</strong>
               </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-neutral-500 dark:text-neutral-500 select-none">•</span>
               <span>
-                I believe actions speak louder than words, so I put my code where my mouth is.
+                Learning in System Design & GenAI.
               </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-neutral-500 dark:text-neutral-500 select-none">•</span>
               <span>
-                Currently building <strong className="text-neutral-900 dark:text-neutral-200 font-semibold">high-performance web products, VengeanceUI,</strong> and experimental AI tools.
+               Passionate about exploring new technologies & learning new things.
               </span>
             </li>
           </ul>

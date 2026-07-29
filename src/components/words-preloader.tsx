@@ -142,12 +142,12 @@ export function WordsPreloaderGate({
   const activeWord = useMemo(() => words[wordIndex] ?? words[0], [wordIndex, words]);
 
   return (
-    <main className="relative">
+    <div className="relative">
       <AnimatePresence mode="wait">
         {isLoading && <WordsPreloader key="words-preloader" word={activeWord} />}
       </AnimatePresence>
       {children}
-    </main>
+    </div>
   );
 }
 

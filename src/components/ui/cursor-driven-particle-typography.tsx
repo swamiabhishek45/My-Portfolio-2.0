@@ -151,9 +151,22 @@ export function CursorDrivenParticleTypography({
 
             ctx.scale(dpr, dpr);
 
-            // Determine text color
+            // Determine text color dynamically with dark/light mode fallback
+            const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
             const computedStyle = window.getComputedStyle(container);
-            const textColor = color || computedStyle.color || "#000000";
+            let textColor = color;
+            if (!textColor) {
+                const compColor = computedStyle.color;
+                if (isDark) {
+                    textColor = (!compColor || compColor === "rgb(0, 0, 0)" || compColor === "#000000" || compColor.startsWith("rgba(0, 0, 0"))
+                        ? "#ffffff"
+                        : compColor;
+                } else {
+                    textColor = (!compColor || compColor === "rgb(255, 255, 255)" || compColor === "#ffffff" || compColor.startsWith("rgba(255, 255, 255"))
+                        ? "#171717"
+                        : compColor;
+                }
+            }
 
             ctx.clearRect(0, 0, containerWidth, containerHeight);
 
@@ -273,7 +286,7 @@ export function CursorDrivenParticleTypography({
     return (
         <div
             ref={containerRef}
-            className={cn("w-full h-full min-h-[400px] flex items-center justify-center relative touch-none", className)}
+            className={cn("w-full h-full min-h-[160px] flex items-center justify-center relative touch-none", className)}
         >
             <canvas
                 ref={canvasRef}
