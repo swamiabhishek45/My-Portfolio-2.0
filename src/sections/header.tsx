@@ -15,6 +15,23 @@ export default function Header() {
   const [visitorCount, setVisitorCount] = useState<number | null>(null);
   const [wordIndex, setWordIndex] = useState(0);
   const [currentTime, setCurrentTime] = useState("");
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const updateTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    updateTheme();
+
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const ref = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -134,8 +151,8 @@ export default function Header() {
       {/* Top Panoramic Hero Banner */}
       <div className="relative w-full h-40 sm:h-48 overflow-hidden border-b border-dotted border-neutral-300 dark:border-neutral-800/80 group">
         <img
-          src="/banner.png"
-          alt="Header Banner"
+          src={isDark ? "/night-banner.png" : "/day-banner.png"}
+          alt={isDark ? "Night Banner" : "Day Banner"}
           className="w-full h-full object-cover object-center filter brightness-95 dark:brightness-90 transition-transform duration-700 group-hover:scale-105"
         />
         <canvas
