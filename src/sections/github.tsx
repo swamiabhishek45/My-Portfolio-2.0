@@ -1,8 +1,10 @@
 import { Suspense } from "react";
 import {
   GitHubContributions,
+  GitHubContributionsError,
   GitHubContributionsFallback,
 } from "@/components/github-contributions";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { getCachedContributions } from "@/lib/get-cached-contributions";
 
 const GITHUB_USERNAME = "swamiabhishek45";
@@ -20,12 +22,17 @@ export default function GitHub() {
 
         {/* The Calendar */}
         <div className="github-calendar-wrapper w-full flex justify-center">
-          <Suspense fallback={<GitHubContributionsFallback />}>
-            <GitHubContributions
-              contributions={contributions}
-              githubProfileUrl={GITHUB_PROFILE_URL}
-            />
-          </Suspense>
+          <ErrorBoundary
+            label="GitHub contributions"
+            fallback={<GitHubContributionsError />}
+          >
+            <Suspense fallback={<GitHubContributionsFallback />}>
+              <GitHubContributions
+                contributions={contributions}
+                githubProfileUrl={GITHUB_PROFILE_URL}
+              />
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </div>
     </section>

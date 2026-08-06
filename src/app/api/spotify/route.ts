@@ -11,7 +11,33 @@ const NOW_PLAYING_ENDPOINT = `https://api.spotify.com/v1/me/player/currently-pla
 const RECENTLY_PLAYED_ENDPOINT = `https://api.spotify.com/v1/me/player/recently-played?limit=1`;
 const TOKEN_ENDPOINT = `https://accounts.spotify.com/api/token`;
 
-const getAccessToken = async () => {
+const CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+};
+
+// Shown only when Spotify credentials are not configured, so local runs and
+// forks still render the card. Never used to mask a real API failure.
+const PLACEHOLDER_TRACK = {
+  isPlaying: false,
+  title: "One Day",
+  artist: "Kodaline",
+  album: "In a Perfect World",
+  albumImageUrl:
+    "https://i.scdn.co/image/ab67616d0000b273b400994f31c26c04f981014e",
+  songUrl: "https://open.spotify.com/track/1a2RlhZ6aU3a4eM1962j4d",
+  isMock: true,
+};
+
+type SpotifyArtist = { name: string };
+
+type SpotifyTrack = {
+  name: string;
+  artists: SpotifyArtist[];
+  album: { name: string; images: { url: string }[] };
+  external_urls: { spotify: string };
+};
+
+const getAccessToken = async (): Promise<string> => {
   const response = await fetch(TOKEN_ENDPOINT, {
     method: "POST",
     headers: {
@@ -25,35 +51,40 @@ const getAccessToken = async () => {
     cache: "no-store",
   });
 
-  return response.json();
+  if (!response.ok) {
+    throw new Error(
+      `Spotify token endpoint returned status ${response.status}: ${await response
+        .text()
+        .catch(() => "<unreadable body>")}`
+    );
+  }
+
+  const { access_token } = await response.json();
+
+  if (!access_token) {
+    throw new Error("Spotify token response did not contain an access token");
+  }
+
+  return access_token;
 };
 
-export async function GET() {
-  const cacheHeaders = {
-    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-  };
+const serializeTrack = (track: SpotifyTrack, isPlaying: boolean) => ({
+  isPlaying,
+  title: track.name,
+  artist: track.artists.map((artist) => artist.name).join(", "),
+  album: track.album.name,
+  albumImageUrl: track.album.images[0]?.url,
+  songUrl: track.external_urls.spotify,
+});
 
-  // If credentials are not set, return mock data matching the user's reference image
+export async function GET() {
   if (!client_id || !client_secret || !refresh_token) {
-    return NextResponse.json({
-      isPlaying: false,
-      title: "One Day",
-      artist: "Kodaline",
-      album: "In a Perfect World",
-      albumImageUrl: "https://i.scdn.co/image/ab67616d0000b273b400994f31c26c04f981014e",
-      songUrl: "https://open.spotify.com/track/1a2RlhZ6aU3a4eM1962j4d",
-    }, {
-      headers: cacheHeaders,
-    });
+    return NextResponse.json(PLACEHOLDER_TRACK, { headers: CACHE_HEADERS });
   }
 
   try {
-    const { access_token } = await getAccessToken();
-    if (!access_token) {
-      throw new Error("Failed to get access token from Spotify");
-    }
+    const access_token = await getAccessToken();
 
-    // 1. Try to fetch currently playing track
     const currentlyPlayingRes = await fetch(NOW_PLAYING_ENDPOINT, {
       headers: {
         Authorization: `Bearer ${access_token}`,
@@ -61,64 +92,59 @@ export async function GET() {
       cache: "no-store",
     });
 
-    if (currentlyPlayingRes.status === 204 || currentlyPlayingRes.status > 400) {
-      // Nothing is playing, fallback to recently played track
-      const recentlyPlayedRes = await fetch(RECENTLY_PLAYED_ENDPOINT, {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-        cache: "no-store",
-      });
-
-      if (!recentlyPlayedRes.ok) {
-        throw new Error("Failed to fetch recently played");
-      }
-
-      const recentlyPlayed = await recentlyPlayedRes.json();
-      const track = recentlyPlayed.items[0]?.track;
-
-      if (!track) {
-        throw new Error("No recently played track found");
-      }
-
-      return NextResponse.json({
-        isPlaying: false,
-        title: track.name,
-        artist: track.artists.map((_artist: any) => _artist.name).join(", "),
-        album: track.album.name,
-        albumImageUrl: track.album.images[0]?.url,
-        songUrl: track.external_urls.spotify,
-      }, {
-        headers: cacheHeaders,
-      });
+    // 204 means nothing is playing; anything else that is not ok is a genuine
+    // failure and must not be silently treated as "nothing playing".
+    if (currentlyPlayingRes.status !== 204 && !currentlyPlayingRes.ok) {
+      throw new Error(
+        `Spotify currently-playing endpoint returned status ${currentlyPlayingRes.status}`
+      );
     }
 
-    const song = await currentlyPlayingRes.json();
-    if (!song.item) {
-      throw new Error("No currently playing song item found");
+    if (currentlyPlayingRes.status !== 204) {
+      const song = await currentlyPlayingRes.json();
+
+      if (song?.item) {
+        return NextResponse.json(serializeTrack(song.item, song.is_playing), {
+          headers: CACHE_HEADERS,
+        });
+      }
     }
 
-    return NextResponse.json({
-      isPlaying: song.is_playing,
-      title: song.item.name,
-      artist: song.item.artists.map((_artist: any) => _artist.name).join(", "),
-      album: song.item.album.name,
-      albumImageUrl: song.item.album.images[0]?.url,
-      songUrl: song.item.external_urls.spotify,
-    }, {
-      headers: cacheHeaders,
+    // Nothing is playing, fall back to the most recently played track.
+    const recentlyPlayedRes = await fetch(RECENTLY_PLAYED_ENDPOINT, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+      cache: "no-store",
+    });
+
+    if (!recentlyPlayedRes.ok) {
+      throw new Error(
+        `Spotify recently-played endpoint returned status ${recentlyPlayedRes.status}`
+      );
+    }
+
+    const recentlyPlayed = await recentlyPlayedRes.json();
+    const track: SpotifyTrack | undefined = recentlyPlayed?.items?.[0]?.track;
+
+    if (!track) {
+      return NextResponse.json(
+        { error: "no_track_available" },
+        { status: 404, headers: CACHE_HEADERS }
+      );
+    }
+
+    return NextResponse.json(serializeTrack(track, false), {
+      headers: CACHE_HEADERS,
     });
   } catch (error) {
-    console.error("Spotify API error, returning mock track:", error);
-    return NextResponse.json({
-      isPlaying: false,
-      title: "One Day",
-      artist: "Kodaline",
-      album: "In a Perfect World",
-      albumImageUrl: "https://i.scdn.co/image/ab67616d0000b273b400994f31c26c04f981014e",
-      songUrl: "https://open.spotify.com/track/1a2RlhZ6aU3a4eM1962j4d",
-    }, {
-      headers: cacheHeaders,
-    });
+    console.error("Spotify API error:", error);
+    return NextResponse.json(
+      {
+        error: "spotify_unavailable",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 502, headers: CACHE_HEADERS }
+    );
   }
 }

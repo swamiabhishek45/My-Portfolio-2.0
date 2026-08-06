@@ -14,28 +14,63 @@ interface SpotifyTrack {
 
 export default function SpotifyCard() {
   const [track, setTrack] = useState<SpotifyTrack | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function fetchSpotifyStatus() {
       try {
         const res = await fetch("/api/spotify");
-        if (res.ok) {
-          const data = await res.json();
-          setTrack(data);
+
+        if (!res.ok) {
+          const body = await res.json().catch(() => null);
+          throw new Error(
+            body?.message || body?.error || `Request failed with ${res.status}`
+          );
         }
-      } catch (error) {
-        console.error("Failed to fetch Spotify status:", error);
+
+        const data = await res.json();
+        if (cancelled) return;
+        setTrack(data);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch Spotify status:", err);
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
 
     fetchSpotifyStatus();
     // Poll Spotify status every 15 seconds to keep it fresh
     const interval = setInterval(fetchSpotifyStatus, 15000);
-    return () => clearInterval(interval);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, []);
+
+  // Keep showing the last known track if a later poll fails.
+  if (error && !track) {
+    return (
+      <div className="flex items-center gap-4 p-4 border border-neutral-200 dark:border-neutral-800/80 bg-neutral-50/70 dark:bg-neutral-900/50 rounded-xl max-w-md w-full">
+        <div className="w-12 h-12 rounded-full flex items-center justify-center border border-neutral-300 dark:border-neutral-700 text-neutral-400 shrink-0">
+          <FaSpotify className="w-5 h-5" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="font-semibold text-sm text-neutral-900 dark:text-neutral-100">
+            Spotify unavailable
+          </div>
+          <div className="truncate text-xs text-neutral-600 dark:text-neutral-400">
+            {error}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading || !track) {
     return (

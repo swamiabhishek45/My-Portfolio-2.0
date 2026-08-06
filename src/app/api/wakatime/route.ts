@@ -85,13 +85,18 @@ export async function GET() {
 
     // Try parsing status bar data for active time today
     let activeTimeToday = "0 mins";
-    if (statusBarRes && statusBarRes.ok) {
+    if (statusBarRes?.ok) {
       try {
         const statusBarData = await statusBarRes.json();
         activeTimeToday = statusBarData?.data?.grand_total?.text || "0 mins";
       } catch (err) {
+        // Non-fatal: the rest of the status is still usable without it.
         console.error("Failed to parse WakaTime status bar JSON:", err);
       }
+    } else if (statusBarRes) {
+      console.error(
+        `WakaTime status_bar/today returned status ${statusBarRes.status}`
+      );
     }
 
     const lastHeartbeatAt = data.last_heartbeat_at;
@@ -136,18 +141,15 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error in WakaTime developer status API:", error);
-    // Fallback in case of server/API issues
-    return NextResponse.json({
-      status: "idle",
-      editor: "Cursor",
-      project: "My-Portfolio-2.0",
-      language: "TypeScript",
-      lastActive: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-      activeTimeToday: "12 mins",
-      isMock: true,
-      error: error instanceof Error ? error.message : "Unknown error",
-    }, {
-      headers: cacheHeaders,
-    });
+    return NextResponse.json(
+      {
+        error: "wakatime_unavailable",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+      {
+        status: 502,
+        headers: cacheHeaders,
+      }
+    );
   }
 }
