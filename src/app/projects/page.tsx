@@ -71,6 +71,7 @@ export default function ProjectsPage() {
                                     <a
                                         href={project.github}
                                         target="_blank"
+                                        rel="noopener noreferrer"
                                         className="flex items-center gap-1 px-3 py-1.5 border rounded-md text-xs hover:bg-neutral-200 dark:hover:bg-neutral-700 transition"
                                     >
                                         <FaGithub className="text-sm" /> GitHub
@@ -79,6 +80,7 @@ export default function ProjectsPage() {
                                     <a
                                         href={project.live}
                                         target="_blank"
+                                        rel="noopener noreferrer"
                                         className="flex items-center gap-1 px-3 py-1.5 border rounded-md text-xs hover:bg-neutral-200 dark:hover:bg-neutral-700 transition"
                                     >
                                         <LiaExternalLinkAltSolid className="text-sm" /> Live

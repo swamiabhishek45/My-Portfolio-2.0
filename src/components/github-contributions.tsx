@@ -73,7 +73,7 @@ export function GitHubContributions({
                 className="text-foreground link-underline"
                 href={githubProfileUrl}
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer"
               >
                 GitHub
               </a>
