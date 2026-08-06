@@ -13,10 +13,18 @@ interface WakaTimeStatus {
   isMock?: boolean;
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => {
-  if (!res.ok) throw new Error("Failed to fetch status");
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(
+      body?.message || body?.error || `Failed to fetch status (${res.status})`
+    );
+  }
+
   return res.json();
-});
+};
 
 export default function DeveloperStatus() {
   const { data, error, isLoading, mutate } = useSWR<WakaTimeStatus>(
@@ -79,8 +87,8 @@ export default function DeveloperStatus() {
           <div className="font-semibold text-sm text-red-900 dark:text-red-300">
             Failed to load status
           </div>
-          <div className="text-xs text-red-600 dark:text-red-400">
-            WakaTime fetch failed
+          <div className="truncate text-xs text-red-600 dark:text-red-400">
+            {error instanceof Error ? error.message : "WakaTime fetch failed"}
           </div>
         </div>
         <button

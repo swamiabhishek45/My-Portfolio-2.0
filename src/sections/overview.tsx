@@ -127,6 +127,8 @@ export default function Overview() {
         }
       } catch (err) {
         console.error("Error updating timezone clock:", err);
+        setTime("--:--:--");
+        setTimeDiff("unavailable");
       }
     };
 

@@ -11,6 +11,19 @@ import { TextFlip } from "@/components/text-flip";
 
 const WORDS = ["Developer", "Engineer", "Learner"];
 
+async function fetchJson(url: string) {
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(
+      body?.message || body?.error || `${url} failed with ${res.status}`
+    );
+  }
+
+  return res.json();
+}
+
 export default function Header() {
   const [visitorCount, setVisitorCount] = useState<number | null>(null);
   const [wordIndex, setWordIndex] = useState(0);
@@ -38,11 +51,10 @@ export default function Header() {
   const isInView = useInView(ref);
   const play = isInView;
 
-  const { data: statusData } = useSWR(
-    "/api/wakatime",
-    (url) => fetch(url).then((res) => res.json()),
-    { refreshInterval: 60000 }
-  );
+  const { data: statusData } = useSWR("/api/wakatime", fetchJson, {
+    refreshInterval: 60000,
+    onError: (err) => console.error("Failed to fetch coding status:", err),
+  });
 
   const isCoding = statusData?.status === "coding";
   const editor = statusData?.editor || "VS Code";
@@ -59,12 +71,10 @@ export default function Header() {
   useEffect(() => {
     async function fetchVisitorCount() {
       try {
-        const res = await fetch("/api/visitor");
-        if (res.ok) {
-          const data = await res.json();
-          setVisitorCount(data.count);
-        }
+        const data = await fetchJson("/api/visitor");
+        setVisitorCount(data.count);
       } catch (error) {
+        // The badge stays hidden rather than showing a fabricated count.
         console.error("Failed to fetch visitor count:", error);
       }
     }

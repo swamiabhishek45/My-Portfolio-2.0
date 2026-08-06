@@ -88,6 +88,14 @@ export function GitHubContributions({
   )
 }
 
+export function GitHubContributionsError() {
+  return (
+    <div className="flex h-40.5 w-full items-center justify-center text-sm text-muted-foreground">
+      Could not load GitHub contributions right now.
+    </div>
+  )
+}
+
 export function GitHubContributionsFallback() {
   return (
     <div className="flex h-40.5 w-full items-center justify-center">
