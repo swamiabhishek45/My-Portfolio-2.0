@@ -145,7 +145,6 @@ export async function GET() {
       lastActive: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
       activeTimeToday: "12 mins",
       isMock: true,
-      error: error instanceof Error ? error.message : "Unknown error",
     }, {
       headers: cacheHeaders,
     });
