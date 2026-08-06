@@ -8,6 +8,8 @@ import CountUp from "@/components/ui/count-up";
 import { Eye, BadgeCheck } from "lucide-react";
 import { motion, useInView } from "motion/react";
 import { TextFlip } from "@/components/text-flip";
+import { fetchJson, jsonFetcher } from "@/lib/fetch-json";
+import type { WakaTimeStatus } from "@/lib/types";
 
 const WORDS = ["Developer", "Engineer", "Learner"];
 
@@ -38,9 +40,9 @@ export default function Header() {
   const isInView = useInView(ref);
   const play = isInView;
 
-  const { data: statusData } = useSWR(
+  const { data: statusData } = useSWR<WakaTimeStatus>(
     "/api/wakatime",
-    (url) => fetch(url).then((res) => res.json()),
+    jsonFetcher,
     { refreshInterval: 60000 }
   );
 
@@ -59,11 +61,8 @@ export default function Header() {
   useEffect(() => {
     async function fetchVisitorCount() {
       try {
-        const res = await fetch("/api/visitor");
-        if (res.ok) {
-          const data = await res.json();
-          setVisitorCount(data.count);
-        }
+        const data = await fetchJson<{ count: number }>("/api/visitor");
+        setVisitorCount(data.count);
       } catch (error) {
         console.error("Failed to fetch visitor count:", error);
       }

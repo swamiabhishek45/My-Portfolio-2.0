@@ -3,25 +3,13 @@
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { Terminal, AlertCircle, RefreshCw } from "lucide-react";
-
-interface WakaTimeStatus {
-  status: "coding" | "idle";
-  editor: string;
-  project: string | null;
-  language: string | null;
-  lastActive: string | null;
-  isMock?: boolean;
-}
-
-const fetcher = (url: string) => fetch(url).then((res) => {
-  if (!res.ok) throw new Error("Failed to fetch status");
-  return res.json();
-});
+import { jsonFetcher } from "@/lib/fetch-json";
+import type { WakaTimeStatus } from "@/lib/types";
 
 export default function DeveloperStatus() {
   const { data, error, isLoading, mutate } = useSWR<WakaTimeStatus>(
     "/api/wakatime",
-    fetcher,
+    jsonFetcher,
     {
       refreshInterval: 60000, // Refresh every 60 seconds
       revalidateOnFocus: true,

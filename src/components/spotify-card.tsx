@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FaSpotify } from "react-icons/fa";
+import { fetchJson } from "@/lib/fetch-json";
 
 interface SpotifyTrack {
   isPlaying: boolean;
@@ -19,11 +20,7 @@ export default function SpotifyCard() {
   useEffect(() => {
     async function fetchSpotifyStatus() {
       try {
-        const res = await fetch("/api/spotify");
-        if (res.ok) {
-          const data = await res.json();
-          setTrack(data);
-        }
+        setTrack(await fetchJson<SpotifyTrack>("/api/spotify"));
       } catch (error) {
         console.error("Failed to fetch Spotify status:", error);
       } finally {
