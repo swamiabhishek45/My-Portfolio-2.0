@@ -1,9 +1,35 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { aboutBullets } from "@/data/about";
+import { aboutBullets, type AboutBullet as AboutBulletData } from "@/data/about";
 import { ChevronDownIcon, ChevronDownIconHandle } from "@/components/animated-icons/chevron-down-icon";
 import { motion, AnimatePresence } from "framer-motion";
+
+const AboutBullet = ({
+  bullet,
+  as: Tag = "li",
+}: {
+  bullet: AboutBulletData;
+  as?: "li" | "div";
+}) => (
+  <Tag className="flex items-start gap-3 text-neutral-600 dark:text-neutral-400 text-sm sm:text-base leading-relaxed">
+    <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 dark:bg-neutral-600 mt-2.5 shrink-0" />
+    <span>
+      {bullet.segments.map((seg, index) =>
+        seg.bold ? (
+          <strong
+            key={index}
+            className="font-semibold text-neutral-900 dark:text-neutral-100"
+          >
+            {seg.text}
+          </strong>
+        ) : (
+          <span key={index}>{seg.text}</span>
+        )
+      )}
+    </span>
+  </Tag>
+);
 
 export default function About() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -46,27 +72,7 @@ export default function About() {
           <ul className="flex flex-col gap-3.5">
             {/* Always Visible Bullets */}
             {visibleBullets.map((bullet, index) => (
-              <li
-                key={index}
-                className="flex items-start gap-3 text-neutral-600 dark:text-neutral-400 text-sm sm:text-base leading-relaxed"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 dark:bg-neutral-600 mt-2.5 shrink-0" />
-                <span>
-                  {bullet.segments.map((seg, sIdx) => {
-                    if (seg.bold) {
-                      return (
-                        <strong
-                          key={sIdx}
-                          className="font-semibold text-neutral-900 dark:text-neutral-100"
-                        >
-                          {seg.text}
-                        </strong>
-                      );
-                    }
-                    return <span key={sIdx}>{seg.text}</span>;
-                  })}
-                </span>
-              </li>
+              <AboutBullet bullet={bullet} key={index} />
             ))}
 
             {/* Collapsible Bullets with Smooth Transition */}
@@ -80,27 +86,7 @@ export default function About() {
                   className="overflow-hidden flex flex-col gap-3.5"
                 >
                   {collapsibleBullets.map((bullet, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start gap-3 text-neutral-600 dark:text-neutral-400 text-sm sm:text-base leading-relaxed"
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 dark:bg-neutral-600 mt-2.5 shrink-0" />
-                      <span>
-                        {bullet.segments.map((seg, sIdx) => {
-                          if (seg.bold) {
-                            return (
-                              <strong
-                                key={sIdx}
-                                className="font-semibold text-neutral-900 dark:text-neutral-100"
-                              >
-                                {seg.text}
-                              </strong>
-                            );
-                          }
-                          return <span key={sIdx}>{seg.text}</span>;
-                        })}
-                      </span>
-                    </div>
+                    <AboutBullet as="div" bullet={bullet} key={index} />
                   ))}
                 </motion.div>
               )}

@@ -3,12 +3,15 @@
 import { useImperativeHandle } from "react"
 import { motion, useAnimation } from "motion/react"
 
-export type ChevronDownIconHandle = {
-  startAnimation: () => void
-  stopAnimation: () => void
-}
+import {
+  AnimatedIconSvg,
+  type AnimatedIconHandle,
+  type AnimatedIconSvgProps,
+} from "@/components/ui/animated-icon"
 
-export type ChevronDownIconProps = React.ComponentPropsWithoutRef<"svg"> & {
+export type ChevronDownIconHandle = AnimatedIconHandle
+
+export type ChevronDownIconProps = Omit<AnimatedIconSvgProps, "ref"> & {
   ref?: React.Ref<ChevronDownIconHandle>
   duration?: number
 }
@@ -28,19 +31,7 @@ export function ChevronDownIcon({
   })
 
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-      {...props}
-    >
+    <AnimatedIconSvg size={24} aria-hidden {...props}>
       <motion.path
         d="M6 9L12 15L18 9"
         variants={{
@@ -57,6 +48,6 @@ export function ChevronDownIcon({
           duration,
         }}
       />
-    </svg>
+    </AnimatedIconSvg>
   )
 }

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { basicAuthHeader, fetchNoStore, noStoreJson } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
@@ -31,13 +31,9 @@ function getEditorName(pluginString: string): string {
 }
 
 export async function GET() {
-  const cacheHeaders = {
-    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-  };
-
   // If API key is not configured, return realistic mock data matching the user's requirements
   if (!WAKATIME_API_KEY) {
-    return NextResponse.json({
+    return noStoreJson({
       status: "coding",
       editor: "Antigravity",
       project: "My-Portfolio-2.0",
@@ -45,27 +41,19 @@ export async function GET() {
       lastActive: new Date().toISOString(),
       activeTimeToday: "45 mins",
       isMock: true,
-    }, {
-      headers: cacheHeaders,
     });
   }
 
   try {
-    const basic = Buffer.from(WAKATIME_API_KEY).toString("base64");
-    
+    const authHeaders = { Authorization: basicAuthHeader(WAKATIME_API_KEY) };
+
     // Fetch both the current user details and today's status bar data in parallel
     const [userRes, statusBarRes] = await Promise.all([
-      fetch("https://wakatime.com/api/v1/users/current", {
-        headers: {
-          Authorization: `Basic ${basic}`,
-        },
-        cache: "no-store",
+      fetchNoStore("https://wakatime.com/api/v1/users/current", {
+        headers: authHeaders,
       }),
-      fetch("https://wakatime.com/api/v1/users/current/status_bar/today", {
-        headers: {
-          Authorization: `Basic ${basic}`,
-        },
-        cache: "no-store",
+      fetchNoStore("https://wakatime.com/api/v1/users/current/status_bar/today", {
+        headers: authHeaders,
       }).catch((err) => {
         console.error("Failed to fetch WakaTime status_bar/today:", err);
         return null;
@@ -100,7 +88,7 @@ export async function GET() {
     const lastPlugin = data.last_plugin || "";
 
     if (!lastHeartbeatAt) {
-      return NextResponse.json({
+      return noStoreJson({
         status: "idle",
         editor: "Unknown",
         project: null,
@@ -108,8 +96,6 @@ export async function GET() {
         lastActive: null,
         activeTimeToday,
         isMock: false,
-      }, {
-        headers: cacheHeaders,
       });
     }
 
@@ -123,7 +109,7 @@ export async function GET() {
     const status = isCoding ? "coding" : "idle";
     const editor = getEditorName(lastPlugin);
 
-    return NextResponse.json({
+    return noStoreJson({
       status,
       editor,
       project: lastProject,
@@ -131,13 +117,11 @@ export async function GET() {
       lastActive: lastHeartbeatAt,
       activeTimeToday,
       isMock: false,
-    }, {
-      headers: cacheHeaders,
     });
   } catch (error) {
     console.error("Error in WakaTime developer status API:", error);
     // Fallback in case of server/API issues
-    return NextResponse.json({
+    return noStoreJson({
       status: "idle",
       editor: "Cursor",
       project: "My-Portfolio-2.0",
@@ -146,8 +130,6 @@ export async function GET() {
       activeTimeToday: "12 mins",
       isMock: true,
       error: error instanceof Error ? error.message : "Unknown error",
-    }, {
-      headers: cacheHeaders,
     });
   }
 }

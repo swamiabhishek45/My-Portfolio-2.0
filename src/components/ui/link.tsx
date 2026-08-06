@@ -2,19 +2,16 @@
 
 import type { Variants } from "motion/react";
 import { motion, useAnimation } from "motion/react";
-import type { HTMLAttributes } from "react";
-import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
+import { forwardRef } from "react";
 
-import { cn } from "@/lib/utils";
+import {
+  AnimatedIconContainer,
+  AnimatedIconSvg,
+  type AnimatedIconHandle,
+  type AnimatedIconProps,
+} from "@/components/ui/animated-icon";
 
-export interface LinkIconHandle {
-  startAnimation: () => void;
-  stopAnimation: () => void;
-}
-
-interface LinkIconProps extends HTMLAttributes<HTMLDivElement> {
-  size?: number;
-}
+export type LinkIconHandle = AnimatedIconHandle;
 
 const PATH_VARIANTS: Variants = {
   initial: { pathLength: 1, pathOffset: 0, rotate: 0 },
@@ -33,59 +30,18 @@ const PATH_VARIANTS: Variants = {
   },
 };
 
-const LinkIcon = forwardRef<LinkIconHandle, LinkIconProps>(
-  ({ onMouseEnter, onMouseLeave, className, size = 28, ...props }, ref) => {
+const LinkIcon = forwardRef<LinkIconHandle, AnimatedIconProps>(
+  ({ size = 28, ...props }, ref) => {
     const controls = useAnimation();
-    const isControlledRef = useRef(false);
 
-    useImperativeHandle(ref, () => {
-      isControlledRef.current = true;
-
-      return {
-        startAnimation: () => controls.start("animate"),
-        stopAnimation: () => controls.start("normal"),
-      };
-    });
-
-    const handleMouseEnter = useCallback(
-      (e: React.MouseEvent<HTMLDivElement>) => {
-        if (isControlledRef.current) {
-          onMouseEnter?.(e);
-        } else {
-          controls.start("animate");
-        }
-      },
-      [controls, onMouseEnter]
-    );
-
-    const handleMouseLeave = useCallback(
-      (e: React.MouseEvent<HTMLDivElement>) => {
-        if (isControlledRef.current) {
-          onMouseLeave?.(e);
-        } else {
-          controls.start("normal");
-        }
-      },
-      [controls, onMouseLeave]
-    );
     return (
-      <div
-        className={cn(className)}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+      <AnimatedIconContainer
+        onStartAnimation={() => controls.start("animate")}
+        onStopAnimation={() => controls.start("normal")}
+        ref={ref}
         {...props}
       >
-        <svg
-          fill="none"
-          height={size}
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-          width={size}
-          xmlns="http://www.w3.org/2000/svg"
-        >
+        <AnimatedIconSvg size={size}>
           <motion.path
             animate={controls}
             d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
@@ -96,8 +52,8 @@ const LinkIcon = forwardRef<LinkIconHandle, LinkIconProps>(
             d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
             variants={PATH_VARIANTS}
           />
-        </svg>
-      </div>
+        </AnimatedIconSvg>
+      </AnimatedIconContainer>
     );
   }
 );
