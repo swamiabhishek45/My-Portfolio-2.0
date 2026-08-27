@@ -175,14 +175,16 @@ export default function Header() {
       {/* Main Profile Info */}
       <div className="p-4 sm:p-6 flex flex-col gap-4 sm:gap-5">
         <div className="flex flex-row items-center gap-3.5 sm:gap-5 text-left min-w-0">
-          {/* Avatar */}
-          <ScannerAvatar
-            primaryImage="/avatar.png"
-            secondaryImage="/photo.png"
-            interval={3000}
-            duration={650}
-            className="w-20 h-20 sm:w-24 sm:h-24 border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 shrink-0 shadow-sm rounded-xl"
-          />
+          {/* Avatar with Double Frame Border */}
+          <div className="p-1 sm:p-1 border border-neutral-300 dark:border-neutral-800 bg-neutral-200/50 dark:bg-neutral-900/80 rounded-[22px] sm:rounded-[26px] shrink-0 shadow-md">
+            <ScannerAvatar
+              primaryImage="/avatar.png"
+              secondaryImage="/photo.png"
+              interval={3000}
+              duration={650}
+              className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl sm:rounded-[18px]"
+            />
+          </div>
 
           {/* Details & Top Controls */}
           <div className="flex-1 flex flex-col justify-center gap-1 min-w-0">
