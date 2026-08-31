@@ -7,7 +7,6 @@ import {
   useReducedMotion,
 } from "framer-motion";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
-import { UnderConstruction } from "@/components/under-construction";
 
 const INTRO_WORDS = ["Hello", "नमस्कार", "Hallo", "வணக்கம்", "栄養", "नमस्ते", "G'day"];
 
@@ -113,24 +112,20 @@ export function WordsPreloaderGate({
   interval = WORD_INTERVAL_MS,
 }: WordsPreloaderGateProps) {
   const [isLoading, setIsLoading] = useState(true);
-  const [showUnderConstruction, setShowUnderConstruction] = useState(true);
   const [wordIndex, setWordIndex] = useState(0);
   const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
-    if (!isLoading && !showUnderConstruction) {
+    if (!isLoading) {
       return;
     }
 
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    let wordTimer: number | undefined;
-    if (isLoading) {
-      wordTimer = window.setInterval(() => {
-        setWordIndex((currentIndex) => (currentIndex + 1) % words.length);
-      }, interval);
-    }
+    const wordTimer = window.setInterval(() => {
+      setWordIndex((currentIndex) => (currentIndex + 1) % words.length);
+    }, interval);
 
     const loadingTimer = window.setTimeout(
       () => setIsLoading(false),
@@ -138,11 +133,11 @@ export function WordsPreloaderGate({
     );
 
     return () => {
-      if (wordTimer) window.clearInterval(wordTimer);
+      window.clearInterval(wordTimer);
       window.clearTimeout(loadingTimer);
       document.body.style.overflow = originalOverflow;
     };
-  }, [duration, interval, isLoading, showUnderConstruction, shouldReduceMotion, words.length]);
+  }, [duration, interval, isLoading, shouldReduceMotion, words.length]);
 
   const activeWord = useMemo(() => words[wordIndex] ?? words[0], [wordIndex, words]);
 
@@ -150,14 +145,6 @@ export function WordsPreloaderGate({
     <div className="relative">
       <AnimatePresence mode="wait">
         {isLoading && <WordsPreloader key="words-preloader" word={activeWord} />}
-      </AnimatePresence>
-      <AnimatePresence>
-        {!isLoading && showUnderConstruction && (
-          <UnderConstruction
-            key="under-construction"
-            onShowWebsite={() => setShowUnderConstruction(false)}
-          />
-        )}
       </AnimatePresence>
       {children}
     </div>

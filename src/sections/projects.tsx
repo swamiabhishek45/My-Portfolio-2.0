@@ -1,138 +1,17 @@
 "use client";
 
-import { useRef } from "react";
-import { projects } from "@/data/projects";
-import Link from "next/link";
-import Image from "next/image";
-import { 
-  Lock, 
-  Settings, 
-  AlertCircle, 
-  ExternalLink 
-} from "lucide-react";
-import { ArrowRightIcon, type ArrowRightIconHandle } from "@/components/ui/arrow-right";
-import { GithubIcon, type GithubIconHandle } from "@/components/ui/github";
+import type { Project } from "@/lib/projects";
+import { ProjectCard } from "@/components/project-card";
 
-const ProjectGithubLink = ({ href }: { href: string }) => {
-  const iconRef = useRef<GithubIconHandle>(null);
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      onMouseEnter={() => iconRef.current?.startAnimation()}
-      onMouseLeave={() => iconRef.current?.stopAnimation()}
-      className="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-xs font-bold text-neutral-700 dark:text-neutral-200 rounded-md transition-colors whitespace-nowrap shadow-sm"
-    >
-      <GithubIcon ref={iconRef} size={14} className="shrink-0" />
-      GitHub
-    </a>
-  );
-};
-
-export default function Projects() {
-  const proj = projects;
-  const arrowRef = useRef<ArrowRightIconHandle>(null);
+export default function Projects({ projects, limit }: { projects: Project[]; limit?: number }) {
+  const visibleProjects = limit ? projects.slice(0, limit) : projects;
 
   return (
-    <section className="flex flex-col w-full">
-      {/* Projects List */}
-      <div className="flex flex-col gap-6">
-        {proj.map((project, index) => (
-          <div
-            key={index}
-            className="border border-dotted border-neutral-300 dark:border-neutral-800 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row gap-6 items-stretch bg-white/40 dark:bg-neutral-950/20 hover:border-neutral-400 dark:hover:border-neutral-700 transition-all duration-300"
-          >
-            {/* Left: Image Container */}
-            <div className="relative w-full md:w-[42%] aspect-[16/10] rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800/80 shadow-lg bg-neutral-950 shrink-0">
-              <Image
-                src={project.src}
-                alt={project.name}
-                fill
-                sizes="(max-width: 768px) 100vw, 40vw"
-                className="object-cover object-top select-none"
-                priority={index === 0}
-              />
-              {/* Overlay badge */}
-              {project.badge && (
-                <div className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-black/80 backdrop-blur-md rounded-md text-[10px] md:text-xs font-semibold text-white border border-white/10 shadow-lg select-none">
-                  {project.badge}
-                </div>
-              )}
-            </div>
-
-            {/* Right: Details */}
-            <div className="flex-1 flex flex-col justify-between w-full">
-              <div>
-                {/* Title and Action Buttons */}
-                <div className="flex items-start md:items-center justify-between gap-4 mb-3">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 tracking-tight">
-                      {project.name}
-                    </h3>
-                    {project.icon === "lock" && (
-                      <Lock className="w-4 h-4 text-emerald-500 fill-emerald-500/10" />
-                    )}
-                    {project.icon === "settings" && (
-                      <Settings className="w-4 h-4 text-neutral-400 animate-spin-slow" />
-                    )}
-                    {project.icon === "info" && (
-                      <AlertCircle className="w-4 h-4 text-amber-500 fill-amber-500/10" />
-                    )}
-                  </div>
-
-                  {/* External Links */}
-                  <div className="flex items-center gap-2">
-                    <a
-                      href={project.live}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-xs font-bold text-neutral-700 dark:text-neutral-200 rounded-md transition-colors whitespace-nowrap shadow-sm"
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                      Live
-                    </a>
-                    <ProjectGithubLink href={project.github} />
-                  </div>
-                </div>
-
-                {/* Description */}
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed mb-4">
-                  {project.shortDescription}
-                </p>
-              </div>
-
-              {/* Technologies list */}
-              <div className="mt-auto">
-                <div className="text-xs font-bold text-neutral-500 dark:text-neutral-500 uppercase tracking-wider mb-2 select-none">
-                  Technologies Used:
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {project.tech.map((t) => (
-                    <span
-                      key={t}
-                      className="px-2 py-0.5 bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800/80 rounded text-xs text-neutral-700 dark:text-neutral-300 font-medium select-none shadow-xs"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+    <section className="flex w-full flex-col">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3.5">
+        {visibleProjects.map((project) => (
+          <ProjectCard key={project.slug} project={project} />
         ))}
-      </div>
-
-      {/* Footer "More Projects" */}
-      <div className="flex justify-end mt-4">
-        <Link
-          href="/projects"
-          className="inline-flex items-center gap-2 px-3 py-1.5 border border-dashed border-neutral-300 dark:border-neutral-700/60 rounded-lg text-sm text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 hover:border-neutral-400 dark:hover:border-neutral-500 transition-colors select-none"
-          onMouseEnter={() => arrowRef.current?.startAnimation()}
-          onMouseLeave={() => arrowRef.current?.stopAnimation()}
-        >
-          More Projects <ArrowRightIcon ref={arrowRef} size={16} className="shrink-0" />
-        </Link>
       </div>
     </section>
   );
