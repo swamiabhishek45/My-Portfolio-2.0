@@ -55,7 +55,7 @@ export default function Page() {
           {/* Open Source Block */}
           <DottedGridSection id="github" className="py-2.5 px-4 sm:px-6 flex items-center">
             <h2 className="text-lg sm:text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 font-sans">
-              Open Source
+              GitHub Activity
             </h2>
           </DottedGridSection>
           <DottedGridSection><GitHub /></DottedGridSection>

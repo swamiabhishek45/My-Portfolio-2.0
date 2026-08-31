@@ -44,21 +44,24 @@ export default function Header() {
   );
 
   const isCoding = statusData?.status === "coding";
-  const editor = statusData?.editor || "VS Code";
-  const statusText = statusData
+  const editor = statusData?.editor || "Antigravity";
+  const statusText = statusData?.configured
     ? isCoding
       ? `Cooking in ${editor}`
       : "Idle · Reading books"
-    : "Cooking in Antigravity";
+    : statusData
+      ? "Idle · Reading books"
+      : "Cooking in Antigravity";
 
-  const activeTimeText = statusData?.activeTimeToday
-    ? ` • ${statusData.activeTimeToday} active today`
-    : "";
+  const activeTimeText =
+    statusData?.configured && statusData.activeTimeToday
+      ? ` • ${statusData.activeTimeToday} active today`
+      : "";
 
   useEffect(() => {
-    async function fetchVisitorCount() {
+    async function trackVisitor() {
       try {
-        const res = await fetch("/api/visitor");
+        const res = await fetch("/api/visitor", { method: "POST" });
         if (res.ok) {
           const data = await res.json();
           setVisitorCount(data.count);
@@ -67,7 +70,7 @@ export default function Header() {
         console.error("Failed to fetch visitor count:", error);
       }
     }
-    fetchVisitorCount();
+    trackVisitor();
   }, []);
 
   useEffect(() => {
