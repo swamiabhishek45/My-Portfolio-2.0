@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef } from "react";
 import useSWR from "swr";
-import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import ScannerAvatar from "@/components/ui/scanner-avatar";
 import CountUp from "@/components/ui/count-up";
 import { Eye, BadgeCheck } from "lucide-react";
@@ -161,10 +160,6 @@ export default function Header() {
           width={491}
           height={200}
         />
-        {/* Theme Toggler at Top Right of Banner (No background, logo only) */}
-        <div className="absolute top-3 right-3 z-10">
-          <AnimatedThemeToggler className="text-white hover:text-amber-200 transition-colors p-1 drop-shadow-md cursor-pointer" />
-        </div>
         {/* Pixel Art Overlay Clock at Bottom Right */}
         <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded border border-neutral-700/50 text-xs font-mono text-neutral-300 shadow-sm flex items-center gap-1.5 select-none z-10">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -175,8 +170,7 @@ export default function Header() {
       {/* Main Profile Info */}
       <div className="p-4 sm:p-6 flex flex-col gap-4 sm:gap-5">
         <div className="flex flex-row items-center gap-3.5 sm:gap-5 text-left min-w-0">
-          {/* Avatar with Double Frame Border */}
-          <div className="p-1 sm:p-1 border border-neutral-300 dark:border-neutral-800 bg-neutral-200/50 dark:bg-neutral-900/80 rounded-[22px] sm:rounded-[26px] shrink-0 shadow-md">
+          {/* Avatar with Liquid Surface Effect */}
             <ScannerAvatar
               primaryImage="/avatar.png"
               secondaryImage="/photo.png"
@@ -184,7 +178,7 @@ export default function Header() {
               duration={650}
               className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl sm:rounded-[18px]"
             />
-          </div>
+
 
           {/* Details & Top Controls */}
           <div className="flex-1 flex flex-col justify-center gap-1 min-w-0">
