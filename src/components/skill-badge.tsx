@@ -19,7 +19,7 @@ export function SkillBadge({
       )}
     >
       <span
-        className="skill-icon flex size-4 items-center justify-center text-base leading-none"
+        className="skill-icon flex size-4 items-center justify-center text-base leading-none [&_img]:size-full [&_img]:object-contain"
         style={
           {
             color: tech.color,

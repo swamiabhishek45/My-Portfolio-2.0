@@ -2,11 +2,14 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import { Globe } from "lucide-react";
+
 import type { Project } from "@/lib/projects";
 import { cn } from "@/lib/utils";
+import {
+  ExternalLinkIcon,
+  type ExternalLinkIconHandle,
+} from "@/components/ui/external-link";
 import { GithubIcon, type GithubIconHandle } from "@/components/ui/github";
-
 const DEFAULT_GRADIENT =
   "bg-gradient-to-br from-neutral-200/30 via-neutral-100/10 to-neutral-950 dark:from-neutral-700/40 dark:via-neutral-900/20 dark:to-neutral-950";
 
@@ -51,7 +54,7 @@ export function ProjectCard({
   className?: string;
 }) {
   const githubRef = useRef<GithubIconHandle>(null);
-  const tagline = project.tagline ?? project.category;
+  const liveLinkRef = useRef<ExternalLinkIconHandle>(null);  const tagline = project.tagline ?? project.category;
   const visibleTech = project.tech.slice(0, 5);
 
   return (
@@ -121,9 +124,18 @@ export function ProjectCard({
 
           <div className="flex items-center gap-1">
             <ProjectLinkIcon href={project.live} label={`${project.name} live site`}>
-              <Globe className="h-5 w-5" strokeWidth={1.75} />
-            </ProjectLinkIcon>
-            <ProjectLinkIcon
+              <span
+                className="flex items-center justify-center"
+                onMouseEnter={() => liveLinkRef.current?.startAnimation()}
+                onMouseLeave={() => liveLinkRef.current?.stopAnimation()}
+              >
+                <ExternalLinkIcon
+                  ref={liveLinkRef}
+                  size={20}
+                  className="text-current"
+                />
+              </span>
+            </ProjectLinkIcon>            <ProjectLinkIcon
               href={project.github}
               label={`${project.name} GitHub repository`}
             >
