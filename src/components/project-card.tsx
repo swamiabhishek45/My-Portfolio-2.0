@@ -36,7 +36,7 @@ function ProjectLinkIcon({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="text-neutral-500 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+      className="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/80 dark:hover:text-neutral-100"
     >
       {children}
     </a>
@@ -119,19 +119,20 @@ export function ProjectCard({
             ))}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <ProjectLinkIcon href={project.live} label={`${project.name} live site`}>
-              <Globe className="h-3.5 w-3.5" strokeWidth={1.75} />
+              <Globe className="h-5 w-5" strokeWidth={1.75} />
             </ProjectLinkIcon>
             <ProjectLinkIcon
               href={project.github}
               label={`${project.name} GitHub repository`}
             >
               <span
+                className="flex items-center justify-center"
                 onMouseEnter={() => githubRef.current?.startAnimation()}
                 onMouseLeave={() => githubRef.current?.stopAnimation()}
               >
-                <GithubIcon ref={githubRef} size={14} className="text-current" />
+                <GithubIcon ref={githubRef} size={20} className="text-current" />
               </span>
             </ProjectLinkIcon>
           </div>

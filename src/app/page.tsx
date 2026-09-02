@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Projects from "@/sections/projects";
 import GitHub from "@/sections/github";
 import Contact from "@/sections/contact";
@@ -40,28 +39,19 @@ export default function Page() {
           <DottedGridSection><Technologies /></DottedGridSection>
 
           {/* Projects Block */}
-          <DottedGridSection id="projects" className="py-2 px-3 sm:px-4 flex items-center justify-between">
+          <DottedGridSection id="projects" className="py-2 px-3 sm:px-4 flex items-center">
             <h2 className="text-lg sm:text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 font-sans">
               Projects
             </h2>
-            <Link
-              href="/projects"
-              className="text-xs font-mono text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200 transition-colors flex items-center gap-1"
-            >
-              View all ↗
-            </Link>
           </DottedGridSection>
           <DottedGridSection className="px-2 sm:px-3">
             <Projects projects={projects} limit={2} />
           </DottedGridSection>
 
-          {/* Open Source Block */}
-          <DottedGridSection id="github" className="py-2 px-3 sm:px-4 flex items-center">
-            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 font-sans">
-              GitHub Activity
-            </h2>
+          {/* GitHub Activity */}
+          <DottedGridSection id="github" className="px-2 sm:px-3">
+            <GitHub />
           </DottedGridSection>
-          <DottedGridSection><GitHub /></DottedGridSection>
 
           {/* Contact Block */}
           <DottedGridSection id="contact" className="py-2 px-3 sm:px-4 flex items-center">

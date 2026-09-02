@@ -7,7 +7,7 @@ export default function ParticleTypographyDense() {
     <div className="w-full">
       <div className="relative h-[160px] min-h-[160px] overflow-hidden text-neutral-900 dark:text-neutral-50 font-bold">
         <CursorDrivenParticleTypography
-          text="Abhishek"
+          text="Abhishek" 
           particleDensity={2}
           particleSize={1.2}
           fontSize={110}

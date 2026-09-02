@@ -7,6 +7,7 @@ import CountUp from "@/components/ui/count-up";
 import { Eye, BadgeCheck } from "lucide-react";
 import { motion, useInView } from "motion/react";
 import { TextFlip } from "@/components/text-flip";
+import { getEditorIcon } from "@/components/icons/tech-brand-icons";
 
 const WORDS = ["Developer", "Engineer", "Learner"];
 
@@ -45,13 +46,8 @@ export default function Header() {
 
   const isCoding = statusData?.status === "coding";
   const editor = statusData?.editor || "Antigravity";
-  const statusText = statusData?.configured
-    ? isCoding
-      ? `Cooking in ${editor}`
-      : "Idle · Reading books"
-    : statusData
-      ? "Idle · Reading books"
-      : "Cooking in Antigravity";
+  const isCooking = statusData?.configured ? isCoding : !statusData;
+  const EditorIcon = getEditorIcon(editor);
 
   const activeTimeText =
     statusData?.configured && statusData.activeTimeToday
@@ -242,7 +238,26 @@ export default function Header() {
                     }`}
                 ></span>
               </span>
-              <span className="truncate">{statusText}{activeTimeText}</span>
+              <span className="flex min-w-0 items-center gap-1 truncate">
+                {isCooking ? (
+                  <>
+                    <span className="shrink-0">Cooking in</span>
+                    {EditorIcon ? (
+                      <EditorIcon
+                        className="h-3.5 w-3.5 shrink-0 text-neutral-800 dark:text-neutral-200"
+                        aria-hidden
+                      />
+                    ) : null}
+                    <span className="truncate">{editor}</span>
+                    {activeTimeText}
+                  </>
+                ) : (
+                  <>
+                    <span>Idle · Reading books</span>
+                    {activeTimeText}
+                  </>
+                )}
+              </span>
             </div>
           </div>
         </div>
