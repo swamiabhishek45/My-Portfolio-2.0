@@ -1,5 +1,5 @@
-import { FaDiscord, FaGithub, FaLinkedin, FaYoutube } from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { FaFilePdf, FaXTwitter } from "react-icons/fa6";
 import { SiLeetcode } from "react-icons/si";
 
 export interface SocialLink {
@@ -13,5 +13,9 @@ export const socialLinks: SocialLink[] = [
   { name: "LinkedIn", link: "https://linkedin.com/in/swamiabhishek45", icon: FaLinkedin },
   { name: "GitHub", link: "https://github.com/swamiabhishek45", icon: FaGithub },
   { name: "LeetCode", link: "https://leetcode.com/swamiabhishek45", icon: SiLeetcode },
-  { name: "YouTube", link: "https://youtube.com/@swamiabhishek45", icon: FaYoutube },
+  {
+    name: "Resume",
+    link: "https://drive.google.com/file/d/1hoPfDhqXQQ0uPzXmZycsqhKg3AUKryZk/view?usp=sharing",
+    icon: FaFilePdf,
+  },
 ];
