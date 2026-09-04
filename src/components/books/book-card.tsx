@@ -49,7 +49,7 @@ export function BookCard({ book }: { book: Book }) {
         </div>
 
         <div className="book3d-caption">
-          <p className="truncate font-sans text-[9px] font-bold text-neutral-200">
+          <p className="truncate font-sans text-[9px] font-bold text-neutral-800 dark:text-neutral-200">
             {book.title}
           </p>
           <p className="truncate font-mono text-[8px] tracking-[0.12em] text-neutral-500 uppercase">

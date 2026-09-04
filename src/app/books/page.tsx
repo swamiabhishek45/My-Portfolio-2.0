@@ -40,12 +40,12 @@ export default function BooksPage() {
           </DottedGridSection>
 
           <DottedGridSection id="book-shelf" className="py-4">
-            <div className="book-shelf-backdrop overflow-visible rounded-2xl border border-dotted border-neutral-800/80 px-5 py-8 sm:px-8 sm:py-10">
+            <div className="book-shelf-backdrop overflow-visible rounded-2xl border border-dotted border-neutral-300 px-5 py-8 sm:px-8 sm:py-10 dark:border-neutral-800/80">
               <div className="mb-7 flex items-baseline justify-between">
-                <h2 className="font-mono text-[10px] tracking-[0.28em] text-neutral-500 uppercase">
+                <h2 className="font-mono text-[10px] tracking-[0.28em] text-neutral-500 uppercase dark:text-neutral-500">
                   Shelf
                 </h2>
-                <p className="font-mono text-[10px] text-neutral-600">
+                <p className="font-mono text-[10px] text-neutral-500 dark:text-neutral-600">
                   Hover to open · tap on mobile
                 </p>
               </div>
