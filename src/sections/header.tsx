@@ -265,7 +265,7 @@ export default function Header() {
         {/* Bio Tagline & Bullet List */}
         <div className="flex flex-col gap-3 pt-3 border-t border-dotted border-neutral-200 dark:border-neutral-800/80">
           <p className="text-sm sm:text-base font-medium text-neutral-900 dark:text-neutral-200 leading-relaxed font-sans">
-            Full Stack Developer. I love building, breaking, and shipping things.
+          Full Stack AI Engineer. I love building, breaking, and shipping things.
           </p>
 
           <ul className="flex flex-col gap-2 text-xs sm:text-sm text-neutral-700 dark:text-neutral-400 font-sans leading-relaxed">

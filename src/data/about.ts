@@ -10,7 +10,7 @@ export interface AboutBullet {
 export const aboutBullets: AboutBullet[] = [
   {
     segments: [
-      { text: "Full Stack Developer", bold: true },
+      { text: "Full Stack AI Engineer", bold: true },
       { text: " ", bold: false },
       { text: "", bold: true },
       { text: "", bold: false },

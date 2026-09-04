@@ -8,7 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata: Metadata = {
   title: "Abhishek Swami",
-  description: "Full Stack Developer",
+  description: "Full Stack AI Engineer",
   icons: {
     icon: "/favicon.png",
     shortcut: "/favicon.png",

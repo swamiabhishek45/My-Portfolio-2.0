@@ -18,7 +18,7 @@ export interface OverviewData {
 
 export const overviewData: OverviewData = {
   roles: [
-    { title: "Full stack Developer", iconName: "code" }
+    { title: "Full Stack AI Engineer", iconName: "code" }
   ],
   location: "Pune, Maharashtra, India",
   phone: "+91 8956* *****",
