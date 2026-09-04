@@ -24,13 +24,13 @@ export default function Projects({
       </div>
 
       {showMoreButton ? (
-        <div className="mt-5 flex justify-center">
+        <div className="relative z-10 mt-6 flex justify-center bg-background py-4">
           <Link
             href="/projects"
-            className="inline-flex items-center gap-2 rounded-xl bg-neutral-800 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-neutral-700 dark:bg-neutral-800 dark:hover:bg-neutral-700"
+            className="group inline-flex items-center gap-2 rounded-full bg-neutral-900 px-6 py-2.5 text-sm font-semibold text-white transition-all hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-white"
           >
             More Projects
-            <ArrowRight className="h-4 w-4" strokeWidth={2} />
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" strokeWidth={2} />
           </Link>
         </div>
       ) : null}
