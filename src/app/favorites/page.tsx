@@ -2,32 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import { IoIosArrowBack } from "react-icons/io";
-import { Heart, Laptop, Code, Wrench, Coffee } from "lucide-react";
+import { Heart, Film, Tv, Sparkles } from "lucide-react";
 import { DottedGridSection } from "@/components/ui/dotted-grid";
 import Navbar from "@/components/navbar";
+import { MediaCard } from "@/components/favorites/media-card";
+import { FAVORITE_MEDIA } from "@/data/favorites-media";
 
-const FAVORITES = [
-  {
-    category: "Development Setup",
-    icon: Laptop,
-    items: ["VS Code + Antigravity AI", "Warp Terminal", "Next.js App Router", "Tailwind CSS"],
-  },
-  {
-    category: "Favorite Tech Stack",
-    icon: Code,
-    items: ["TypeScript", "React / Next.js", "Node.js", "MongoDB / PostgreSQL", "Turbopack"],
-  },
-  {
-    category: "Productivity Tools",
-    icon: Wrench,
-    items: ["Raycast", "Linear", "Figma", "Notion"],
-  },
-  {
-    category: "Daily Essentials",
-    icon: Coffee,
-    items: ["Dark Mode Everywhere", "Lo-Fi Beats", "Mechanical Keyboards", "Espresso"],
-  },
-];
+const MEDIA_ICONS = {
+  Movies: Film,
+  Series: Tv,
+  Anime: Sparkles,
+} as const;
 
 export default function FavoritesPage() {
   const router = useRouter();
@@ -37,10 +22,8 @@ export default function FavoritesPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 flex gap-6 lg:gap-8 justify-center">
         <div className="w-full max-w-2xl flex flex-col gap-6">
 
-          {/* Top Navbar */}
           <DottedGridSection id="navbar"><Navbar /></DottedGridSection>
 
-          {/* Header */}
           <DottedGridSection id="favorites-header" className="py-4 px-4 sm:px-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
@@ -59,33 +42,43 @@ export default function FavoritesPage() {
             </span>
           </DottedGridSection>
 
-          {/* Favorites List */}
-          <DottedGridSection id="favorites-list" className="p-4 sm:p-6 flex flex-col gap-4">
-            {FAVORITES.map((fav, idx) => {
-              const Icon = fav.icon;
-              return (
-                <div
-                  key={idx}
-                  className="border border-dotted border-neutral-300 dark:border-neutral-800/80 rounded-2xl p-5 bg-neutral-50/20 dark:bg-neutral-900/20 flex flex-col gap-3"
-                >
-                  <div className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100 font-bold text-sm">
-                    <Icon className="w-4 h-4 text-blue-500" />
-                    <span>{fav.category}</span>
-                  </div>
+          <DottedGridSection id="favorites-list" className="px-4 pb-6 pt-2 sm:px-6 sm:pb-8">
+            <div className="flex flex-col">
+              {FAVORITE_MEDIA.map((group, index) => {
+                const Icon =
+                  MEDIA_ICONS[group.category as keyof typeof MEDIA_ICONS] ?? Film;
+                return (
+                  <section
+                    key={group.category}
+                    className={`flex flex-col gap-3 py-5 ${
+                      index > 0
+                        ? "border-t border-neutral-200/80 dark:border-neutral-800/90"
+                        : ""
+                    }`}
+                  >
+                    <header className="flex items-center gap-2 border-b border-neutral-200/80 pb-2.5 dark:border-neutral-800/90">
+                      <Icon
+                        className="h-3.5 w-3.5 text-neutral-500 dark:text-neutral-500"
+                        strokeWidth={2}
+                      />
+                      <h2 className="text-sm font-semibold text-neutral-600 dark:text-neutral-400">
+                        {group.category}
+                      </h2>
+                    </header>
 
-                  <div className="flex flex-wrap gap-2">
-                    {fav.items.map((item, itemIdx) => (
-                      <span
-                        key={itemIdx}
-                        className="px-3 py-1 text-xs font-mono rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-dotted border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+                    <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                      {group.items.map((item) => (
+                        <MediaCard
+                          key={item.title}
+                          item={item}
+                          creditLabel={group.creditLabel}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                );
+              })}
+            </div>
           </DottedGridSection>
 
         </div>
