@@ -18,45 +18,45 @@ export interface Book {
 }
 
 export const books: Book[] = [
-  // {
-  //   slug: "steve-jobs",
-  //   title: "Steve Jobs",
-  //   author: "Walter Isaacson",
-  //   cover: "/books/steve-jobs.jpg",
-  //   year: "2011",
-  //   status: "Completed",
-  //   rating: 5,
-  //   note: "Biography · 656 pages",
-  //   excerpt:
-  //     "The people who are crazy enough to think they can change the world are the ones who do.",
-  //   accent: "#3f3f46",
-  // },
-  // {
-  //   slug: "almanack-naval-ravikant",
-  //   title: "The Almanack of Naval Ravikant",
-  //   author: "Eric Jorgenson",
-  //   cover: "/books/almanack-naval-ravikant.jpg",
-  //   year: "2020",
-  //   status: "Completed",
-  //   rating: 5,
-  //   note: "Philosophy · Wealth",
-  //   excerpt:
-  //     "Play long-term games with long-term people. All returns in life come from compound interest.",
-  //   accent: "#52525b",
-  // },
-  // {
-  //   slug: "the-stranger",
-  //   title: "The Stranger",
-  //   author: "Albert Camus",
-  //   cover: "/books/the-stranger.jpg",
-  //   year: "1942",
-  //   status: "Completed",
-  //   rating: 5,
-  //   note: "Fiction · Absurdism",
-  //   excerpt:
-  //     "I opened myself to the gentle indifference of the world, and found it so much like myself.",
-  //   accent: "#18181b",
-  // },
+  {
+    slug: "steve-jobs",
+    title: "Steve Jobs",
+    author: "Walter Isaacson",
+    cover: "/books/steve-jobs.jpg",
+    year: "2011",
+    status: "Completed",
+    rating: 5,
+    note: "Biography · 656 pages",
+    excerpt:
+      "The people who are crazy enough to think they can change the world are the ones who do.",
+    accent: "#3f3f46",
+  },
+  {
+    slug: "almanack-naval-ravikant",
+    title: "The Almanack of Naval Ravikant",
+    author: "Eric Jorgenson",
+    cover: "/books/almanack-naval-ravikant.jpg",
+    year: "2020",
+    status: "Completed",
+    rating: 5,
+    note: "Philosophy · Wealth",
+    excerpt:
+      "Play long-term games with long-term people. All returns in life come from compound interest.",
+    accent: "#52525b",
+  },
+  {
+    slug: "the-stranger",
+    title: "The Stranger",
+    author: "Albert Camus",
+    cover: "/books/the-stranger.jpg",
+    year: "1942",
+    status: "Completed",
+    rating: 5,
+    note: "Fiction · Absurdism",
+    excerpt:
+      "I opened myself to the gentle indifference of the world, and found it so much like myself.",
+    accent: "#18181b",
+  },
   // {
   //   slug: "red-rising",
   //   title: "Red Rising",

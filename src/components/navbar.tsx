@@ -13,6 +13,7 @@ import {
   Newspaper,
   BookOpen,
   Heart,
+  Glasses,
 } from "lucide-react";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { MobiusLoopIcon } from "@/components/mobius-loop-icon";
@@ -35,6 +36,7 @@ const SECTIONS: SectionItem[] = [
   { id: "blog", label: "Blogs", icon: Newspaper, path: "/blog" },
   { id: "books", label: "Books", icon: BookOpen, path: "/books" },
   { id: "favorites", label: "Favorites", icon: Heart, path: "/favorites" },
+  { id: "read", label: "Read", icon: Glasses, path: "/read" },
 ];
 
 const activeNavClass =
@@ -143,7 +145,7 @@ export default function Navbar() {
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-36 py-1.5 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border border-dotted border-neutral-300 dark:border-neutral-800 rounded-xl shadow-lg z-50 flex flex-col text-xs font-mono">
               {SECTIONS.filter((item) =>
-                ["blog", "books", "favorites"].includes(item.id)
+                ["blog", "books", "favorites", "read"].includes(item.id)
               ).map((item) => (
                 <button
                   key={item.id}

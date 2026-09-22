@@ -2,20 +2,15 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-const GITHUB_USERNAME = "swamiabhishek45";
+import {
+  extendWeeksToToday,
+  GITHUB_USERNAME,
+  type ContributionDay,
+  type ContributionMonth,
+  type ContributionWeek,
+} from "@/lib/github-contribution-calendar";
 
-interface ContributionDay {
-  contributionCount: number;
-  date: string;
-}
-
-interface ContributionWeek {
-  contributionDays: ContributionDay[];
-}
-
-interface ContributionMonth {
-  name: string;
-}
+const CONTRIBUTIONS_CACHE_TTL_MS = 60 * 60 * 1000;
 
 interface ContributionLevel {
   cell: string;
@@ -27,6 +22,13 @@ interface TooltipState {
   x: number;
   y: number;
 }
+
+type CachedContributions = {
+  cachedAt: number;
+  weeks: ContributionWeek[];
+  months: ContributionMonth[];
+  totalContributions: number;
+};
 
 const DASHED_LINE_MASK = {
   maskImage:
@@ -57,94 +59,68 @@ export function GithubGraph() {
   const [loading, setLoading] = useState(true);
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
 
-  const emptyWeeks = useMemo<ContributionWeek[]>(() => {
-    const today = new Date();
-    const start = new Date(today);
-    start.setDate(today.getDate() - 370);
-
-    return Array.from({ length: 53 }, (_, weekIndex) => ({
-      contributionDays: Array.from({ length: 7 }, (_, dayIndex) => {
-        const date = new Date(start);
-        date.setDate(start.getDate() + weekIndex * 7 + dayIndex);
-
-        return {
-          contributionCount: 0,
-          date: date.toISOString().slice(0, 10),
-        };
-      }),
-    }));
-  }, []);
-
   useEffect(() => {
+    const cacheKey = `github_contributions_${GITHUB_USERNAME}`;
+
+    const applyCalendar = (calendar: {
+      weeks: ContributionWeek[];
+      months: ContributionMonth[];
+      totalContributions: number;
+    }) => {
+      const normalizedWeeks = extendWeeksToToday(calendar.weeks);
+      setWeeks(normalizedWeeks);
+      setMonths(calendar.months);
+      setTotalContributions(calendar.totalContributions);
+    };
+
     const fetchContributions = async () => {
-      const cacheKey = `github_contributions_${GITHUB_USERNAME}`;
-      const cachedData =
+      const cachedRaw =
         typeof window !== "undefined" ? localStorage.getItem(cacheKey) : null;
 
-      if (cachedData) {
+      if (cachedRaw) {
         try {
-          const parsed = JSON.parse(cachedData) as {
-            weeks: ContributionWeek[];
-            months?: ContributionMonth[];
-            totalContributions: number;
-          };
-          setWeeks(parsed.weeks);
-          setMonths(parsed.months ?? []);
-          setTotalContributions(parsed.totalContributions);
-          setLoading(false);
+          const parsed = JSON.parse(cachedRaw) as CachedContributions;
+          const isFresh =
+            typeof parsed.cachedAt === "number" &&
+            Date.now() - parsed.cachedAt < CONTRIBUTIONS_CACHE_TTL_MS;
+
+          if (isFresh && parsed.weeks?.length) {
+            applyCalendar(parsed);
+            setLoading(false);
+          }
         } catch {
-          setLoading(true);
+          // ignore invalid cache
         }
       }
 
-      const query = `
-        query {
-          user(login: "${GITHUB_USERNAME}") {
-            contributionsCollection {
-              contributionCalendar {
-                totalContributions
-                months {
-                  name
-                }
-                weeks {
-                  contributionDays {
-                    contributionCount
-                    date
-                  }
-                }
-              }
-            }
-          }
-        }
-      `;
-
       try {
-        const response = await fetch("/api/github", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ query }),
-        });
+        const response = await fetch(
+          `/api/github/contributions?username=${encodeURIComponent(GITHUB_USERNAME)}`,
+          { cache: "no-store" }
+        );
 
-        const data = await response.json();
-        const calendar =
-          data?.data?.user?.contributionsCollection?.contributionCalendar;
+        if (!response.ok) {
+          throw new Error(`Contributions API failed (${response.status})`);
+        }
 
-        if (calendar) {
-          setWeeks(calendar.weeks);
-          setMonths(calendar.months);
-          setTotalContributions(calendar.totalContributions);
-          if (typeof window !== "undefined") {
-            localStorage.setItem(
-              cacheKey,
-              JSON.stringify({
-                weeks: calendar.weeks,
-                months: calendar.months,
-                totalContributions: calendar.totalContributions,
-              })
-            );
-          }
+        const calendar = (await response.json()) as {
+          weeks: ContributionWeek[];
+          months: ContributionMonth[];
+          totalContributions: number;
+        };
+
+        applyCalendar(calendar);
+
+        if (typeof window !== "undefined") {
+          localStorage.setItem(
+            cacheKey,
+            JSON.stringify({
+              cachedAt: Date.now(),
+              weeks: extendWeeksToToday(calendar.weeks),
+              months: calendar.months,
+              totalContributions: calendar.totalContributions,
+            })
+          );
         }
       } catch (error) {
         console.error("Failed to fetch GitHub contributions", error);
@@ -201,7 +177,10 @@ export function GithubGraph() {
     months.length > 0
       ? months.map((month) => month.name.substring(0, 3))
       : DEFAULT_MONTHS;
-  const graphWeeks = weeks.length > 0 ? weeks : emptyWeeks;
+
+  const graphWeeks = extendWeeksToToday(weeks);
+  const weekColumnCount = Math.max(graphWeeks.length, 53);
+
   const graphStatus =
     loading && totalContributions === 0
       ? "Loading GitHub contribution activity"
@@ -258,12 +237,15 @@ export function GithubGraph() {
           </div>
 
           <div
-            className="grid grid-cols-[repeat(53,minmax(0,1fr))] gap-x-[2px]"
+            className="grid gap-x-[2px]"
+            style={{
+              gridTemplateColumns: `repeat(${weekColumnCount}, minmax(0, 1fr))`,
+            }}
             role="img"
             aria-label={graphStatus}
           >
             {loading && weeks.length === 0
-              ? Array.from({ length: 53 }).map((_, colIndex) => (
+              ? Array.from({ length: weekColumnCount }).map((_, colIndex) => (
                   <div key={colIndex} className="flex flex-col gap-[2px]">
                     {Array.from({ length: 7 }).map((__, rowIndex) => (
                       <div
