@@ -38,12 +38,12 @@ export function DottedGridSection({
 
       {/* Full-height Left Vertical Dotted Line */}
       {showLeftLine && (
-        <div className="absolute top-[-12px] bottom-[-12px] left-0 w-[1px] bg-[linear-gradient(to_bottom,rgba(160,160,160,0.25)_50%,transparent_0%)] dark:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.12)_50%,transparent_0%)] bg-[length:1px_4px] bg-repeat-y pointer-events-none z-10" />
+        <div className="pointer-events-none absolute top-[-12px] bottom-[-12px] left-0 z-10 hidden w-[1px] bg-[linear-gradient(to_bottom,rgba(160,160,160,0.25)_50%,transparent_0%)] bg-[length:1px_4px] bg-repeat-y dark:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.12)_50%,transparent_0%)] md:block" />
       )}
 
       {/* Full-height Right Vertical Dotted Line */}
       {showRightLine && (
-        <div className="absolute top-[-12px] bottom-[-12px] right-0 w-[1px] bg-[linear-gradient(to_bottom,rgba(160,160,160,0.25)_50%,transparent_0%)] dark:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.12)_50%,transparent_0%)] bg-[length:1px_4px] bg-repeat-y pointer-events-none z-10" />
+        <div className="pointer-events-none absolute top-[-12px] bottom-[-12px] right-0 z-10 hidden w-[1px] bg-[linear-gradient(to_bottom,rgba(160,160,160,0.25)_50%,transparent_0%)] bg-[length:1px_4px] bg-repeat-y dark:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.12)_50%,transparent_0%)] md:block" />
       )}
 
       {/* Grid Intersection Corner Markers */}
@@ -51,19 +51,19 @@ export function DottedGridSection({
         <>
           {/* Top-Left Corner Square Marker */}
           {showTopLine && showLeftLine && (
-            <div className="absolute -top-[1.5px] -left-[1.5px] w-1 h-1 bg-neutral-400/60 dark:bg-neutral-600/60 rounded-[0.5px] z-20 pointer-events-none" />
+            <div className="pointer-events-none absolute -top-[1.5px] -left-[1.5px] z-20 hidden h-1 w-1 rounded-[0.5px] bg-neutral-400/60 dark:bg-neutral-600/60 md:block" />
           )}
           {/* Top-Right Corner Square Marker */}
           {showTopLine && showRightLine && (
-            <div className="absolute -top-[1.5px] -right-[1.5px] w-1 h-1 bg-neutral-400/60 dark:bg-neutral-600/60 rounded-[0.5px] z-20 pointer-events-none" />
+            <div className="pointer-events-none absolute -top-[1.5px] -right-[1.5px] z-20 hidden h-1 w-1 rounded-[0.5px] bg-neutral-400/60 dark:bg-neutral-600/60 md:block" />
           )}
           {/* Bottom-Left Corner Square Marker */}
           {showBottomLine && showLeftLine && (
-            <div className="absolute -bottom-[1.5px] -left-[1.5px] w-1 h-1 bg-neutral-400/60 dark:bg-neutral-600/60 rounded-[0.5px] z-20 pointer-events-none" />
+            <div className="pointer-events-none absolute -bottom-[1.5px] -left-[1.5px] z-20 hidden h-1 w-1 rounded-[0.5px] bg-neutral-400/60 dark:bg-neutral-600/60 md:block" />
           )}
           {/* Bottom-Right Corner Square Marker */}
           {showBottomLine && showRightLine && (
-            <div className="absolute -bottom-[1.5px] -right-[1.5px] w-1 h-1 bg-neutral-400/60 dark:bg-neutral-600/60 rounded-[0.5px] z-20 pointer-events-none" />
+            <div className="pointer-events-none absolute -bottom-[1.5px] -right-[1.5px] z-20 hidden h-1 w-1 rounded-[0.5px] bg-neutral-400/60 dark:bg-neutral-600/60 md:block" />
           )}
         </>
       )}

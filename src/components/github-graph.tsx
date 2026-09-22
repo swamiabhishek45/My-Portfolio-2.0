@@ -196,8 +196,8 @@ export function GithubGraph() {
         className="pointer-events-none absolute top-0 right-[-100vw] left-[-100vw] h-0 border-t border-black/30 dark:border-white/[0.15]"
         style={DASHED_LINE_MASK}
       />
-      <div className="pointer-events-none absolute top-0 -left-4 z-20 size-[2px] -translate-x-1/2 -translate-y-1/2 bg-black/50 dark:bg-white/[0.25]" />
-      <div className="pointer-events-none absolute top-0 -right-4 z-20 size-[2px] translate-x-1/2 -translate-y-1/2 bg-black/50 dark:bg-white/[0.25]" />
+      <div className="pointer-events-none absolute top-0 -left-4 z-20 hidden size-[2px] -translate-x-1/2 -translate-y-1/2 bg-black/50 dark:bg-white/[0.25] md:block" />
+      <div className="pointer-events-none absolute top-0 -right-4 z-20 hidden size-[2px] translate-x-1/2 -translate-y-1/2 bg-black/50 dark:bg-white/[0.25] md:block" />
 
       <div className="relative py-2">
         <div className="flex items-center justify-between gap-3">
@@ -219,8 +219,8 @@ export function GithubGraph() {
           className="pointer-events-none absolute right-[-100vw] bottom-0 left-[-100vw] h-0 border-b border-black/30 dark:border-white/[0.15]"
           style={DASHED_LINE_MASK}
         />
-        <div className="pointer-events-none absolute bottom-0 -left-4 z-20 size-[2px] -translate-x-1/2 translate-y-1/2 bg-black/50 dark:bg-white/[0.25]" />
-        <div className="pointer-events-none absolute -right-4 bottom-0 z-20 size-[2px] translate-x-1/2 translate-y-1/2 bg-black/50 dark:bg-white/[0.25]" />
+        <div className="pointer-events-none absolute bottom-0 -left-4 z-20 hidden size-[2px] -translate-x-1/2 translate-y-1/2 bg-black/50 dark:bg-white/[0.25] md:block" />
+        <div className="pointer-events-none absolute -right-4 bottom-0 z-20 hidden size-[2px] translate-x-1/2 translate-y-1/2 bg-black/50 dark:bg-white/[0.25] md:block" />
       </div>
 
       <p id="github-activity-summary" className="sr-only">
@@ -332,8 +332,8 @@ export function GithubGraph() {
         className="pointer-events-none absolute right-[-100vw] bottom-0 left-[-100vw] h-0 border-b border-black/30 dark:border-white/[0.15]"
         style={DASHED_LINE_MASK}
       />
-      <div className="pointer-events-none absolute bottom-0 -left-4 z-20 size-[2px] -translate-x-1/2 translate-y-1/2 bg-black/50 dark:bg-white/[0.25]" />
-      <div className="pointer-events-none absolute -right-4 bottom-0 z-20 size-[2px] translate-x-1/2 translate-y-1/2 bg-black/50 dark:bg-white/[0.25]" />
+      <div className="pointer-events-none absolute bottom-0 -left-4 z-20 hidden size-[2px] -translate-x-1/2 translate-y-1/2 bg-black/50 dark:bg-white/[0.25] md:block" />
+      <div className="pointer-events-none absolute -right-4 bottom-0 z-20 hidden size-[2px] translate-x-1/2 translate-y-1/2 bg-black/50 dark:bg-white/[0.25] md:block" />
     </section>
   );
 }
