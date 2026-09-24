@@ -5,7 +5,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import { Heart, Film, Tv, Sparkles } from "lucide-react";
 import { DottedGridSection } from "@/components/ui/dotted-grid";
 import Navbar from "@/components/navbar";
-import { MediaCard } from "@/components/favorites/media-card";
+import { MediaSection } from "@/components/favorites/media-section";
 import { FAVORITE_MEDIA } from "@/data/favorites-media";
 
 const MEDIA_ICONS = {
@@ -42,42 +42,31 @@ export default function FavoritesPage() {
             </span>
           </DottedGridSection>
 
-          <DottedGridSection id="favorites-list" className="px-4 pb-6 pt-2 sm:px-6 sm:pb-8">
-            <div className="flex flex-col">
-              {FAVORITE_MEDIA.map((group, index) => {
-                const Icon =
-                  MEDIA_ICONS[group.category as keyof typeof MEDIA_ICONS] ?? Film;
-                return (
-                  <section
-                    key={group.category}
-                    className={`flex flex-col gap-3 py-5 ${
-                      index > 0
-                        ? "border-t border-neutral-200/80 dark:border-neutral-800/90"
-                        : ""
-                    }`}
-                  >
-                    <header className="flex items-center gap-2 border-b border-neutral-200/80 pb-2.5 dark:border-neutral-800/90">
-                      <Icon
-                        className="h-3.5 w-3.5 text-neutral-500 dark:text-neutral-500"
-                        strokeWidth={2}
-                      />
-                      <h2 className="text-sm font-semibold text-neutral-600 dark:text-neutral-400">
-                        {group.category}
-                      </h2>
-                    </header>
+          <DottedGridSection id="favorites-list" className="px-3 pb-6 pt-2 sm:px-6 sm:pb-8">
+            <div className="favorites-screening-room rounded-2xl border border-dotted border-neutral-300/80 px-4 py-6 sm:px-6 sm:py-8 dark:border-neutral-800/80">
+              <div className="mb-6 flex items-baseline justify-between gap-3">
+                <p className="font-mono text-[10px] tracking-[0.28em] text-neutral-500 uppercase">
+                  Screening room
+                </p>
+                <p className="font-mono text-[10px] text-neutral-500 dark:text-neutral-600">
+                  Tap to focus · hover to spotlight
+                </p>
+              </div>
 
-                    <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                      {group.items.map((item) => (
-                        <MediaCard
-                          key={item.title}
-                          item={item}
-                          creditLabel={group.creditLabel}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                );
-              })}
+              <div className="flex flex-col">
+                {FAVORITE_MEDIA.map((group, index) => {
+                  const Icon =
+                    MEDIA_ICONS[group.category as keyof typeof MEDIA_ICONS] ?? Film;
+                  return (
+                    <MediaSection
+                      key={group.category}
+                      group={group}
+                      icon={Icon}
+                      index={index}
+                    />
+                  );
+                })}
+              </div>
             </div>
           </DottedGridSection>
 

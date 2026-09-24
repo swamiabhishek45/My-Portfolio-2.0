@@ -24,7 +24,7 @@ export const books: Book[] = [
     author: "Walter Isaacson",
     cover: "/books/steve-jobs.jpg",
     year: "2011",
-    status: "Completed",
+    status: "Queued",
     rating: 5,
     note: "Biography · 656 pages",
     excerpt:
@@ -37,7 +37,7 @@ export const books: Book[] = [
     author: "Eric Jorgenson",
     cover: "/books/almanack-naval-ravikant.jpg",
     year: "2020",
-    status: "Completed",
+    status: "Queued",
     rating: 5,
     note: "Philosophy · Wealth",
     excerpt:
@@ -50,7 +50,7 @@ export const books: Book[] = [
     author: "Albert Camus",
     cover: "/books/the-stranger.jpg",
     year: "1942",
-    status: "Completed",
+    status: "Queued",
     rating: 5,
     note: "Fiction · Absurdism",
     excerpt:
