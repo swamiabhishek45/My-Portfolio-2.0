@@ -18,7 +18,8 @@ export interface OverviewData {
 
 export const overviewData: OverviewData = {
   roles: [
-    { title: "Full Stack AI Engineer", iconName: "code" }
+    { title: "Full Stack GenAI Engineer", iconName: "code" },
+    { title: "Full Stack Developer @ One Union Solutions", iconName: "globe" },
   ],
   location: "Pune, Maharashtra, India",
   phone: "+91 8956* *****",

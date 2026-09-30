@@ -15,9 +15,13 @@ const ALLOWED: AgentToolName[] = [
   "list_books",
   "get_book",
   "get_profile",
+  "get_career",
   "get_tech_stack",
   "get_medium_posts",
   "get_github_summary",
+  "list_github_repos",
+  "get_github_repo",
+  "get_github_activity",
   "get_spotify_now_playing",
   "get_wakatime_today",
 ];

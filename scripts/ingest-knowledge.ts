@@ -6,13 +6,22 @@ import fs from "fs";
 import path from "path";
 import { createHash } from "crypto";
 
+import { formatCareerAsText } from "../src/lib/agent/career-text";
+import { parseResumePdf } from "../src/lib/agent/parse-resume-pdf";
 import { chunkText } from "../src/lib/agent/rag/chunk";
 import { ensureCollection, upsertDocuments } from "../src/lib/agent/rag/qdrant";
 import type { KnowledgeDocument } from "../src/lib/agent/rag/types";
 import { DEFAULT_COLLECTION } from "../src/lib/agent/rag/types";
 import { sanitizeRetrievedText } from "../src/lib/agent/sanitize";
+import {
+  getGithubActivitySummary,
+  listAllGithubRepos,
+  readmeExcerpt,
+} from "../src/lib/integrations/github-agent";
 import { getProjects } from "../src/lib/projects";
 import { ingestSourcesConfig } from "./ingest-sources.config";
+
+const SKIP_DATA_FILES = new Set(["career.ts"]);
 
 function docId(parts: string[]): string {
   const hex = createHash("sha256").update(parts.join("|")).digest("hex");
@@ -24,7 +33,7 @@ function loadPortfolioDocs(): KnowledgeDocument[] {
   const dataDir = path.join(process.cwd(), "src", "data");
 
   for (const file of fs.readdirSync(dataDir)) {
-    if (!file.endsWith(".ts")) continue;
+    if (!file.endsWith(".ts") || SKIP_DATA_FILES.has(file)) continue;
     const full = path.join(dataDir, file);
     const raw = fs.readFileSync(full, "utf8");
     const text = sanitizeRetrievedText(raw);
@@ -47,10 +56,16 @@ function loadPortfolioDocs(): KnowledgeDocument[] {
   for (const project of getProjects()) {
     const body = [
       project.name,
+      project.tagline ?? "",
+      project.category,
       project.shortDescription,
       project.detailedDescription,
-      project.tech.join(", "),
-    ].join("\n\n");
+      project.github ? `GitHub: ${project.github}` : "",
+      project.live ? `Live: ${project.live}` : "",
+      `Tech: ${project.tech.join(", ")}`,
+    ]
+      .filter(Boolean)
+      .join("\n\n");
     for (const chunk of chunkText(body)) {
       docs.push({
         id: docId(["project", project.slug, chunk.slice(0, 40)]),
@@ -68,6 +83,26 @@ function loadPortfolioDocs(): KnowledgeDocument[] {
     }
   }
 
+  return docs;
+}
+
+function loadCareerDocs(): KnowledgeDocument[] {
+  const text = sanitizeRetrievedText(formatCareerAsText());
+  const docs: KnowledgeDocument[] = [];
+  for (const chunk of chunkText(text)) {
+    docs.push({
+      id: docId(["career", chunk.slice(0, 40)]),
+      text: chunk,
+      payload: {
+        source: "portfolio",
+        title: "Career profile",
+        updated_at: new Date().toISOString(),
+        visibility: "public",
+        do_not_expose: false,
+        section: "career",
+      },
+    });
+  }
   return docs;
 }
 
@@ -106,43 +141,30 @@ async function loadMediumDocs(): Promise<KnowledgeDocument[]> {
 }
 
 async function loadGithubDocs(): Promise<KnowledgeDocument[]> {
-  const token = process.env.GITHUB_TOKEN;
-  const login = ingestSourcesConfig.githubUsername;
-  if (!token) return [];
+  if (!process.env.GITHUB_TOKEN) return [];
 
-  const query = `
-    query($login: String!) {
-      user(login: $login) {
-        repositories(first: 20, orderBy: {field: UPDATED_AT, direction: DESC}, privacy: PUBLIC) {
-          nodes {
-            name
-            description
-            url
-            object(expression: "HEAD:README.md") {
-              ... on Blob { text }
-            }
-          }
-        }
-      }
-    }
-  `;
-
-  const res = await fetch("https://api.github.com/graphql", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ query, variables: { login } }),
-  });
-  const json = await res.json();
-  const nodes = json?.data?.user?.repositories?.nodes ?? [];
+  const repos = await listAllGithubRepos();
   const docs: KnowledgeDocument[] = [];
 
-  for (const repo of nodes) {
+  for (const repo of repos) {
+    const readme = readmeExcerpt(repo.readmeText, 4000);
+    const meta = [
+      repo.description,
+      repo.primaryLanguage?.name
+        ? `Language: ${repo.primaryLanguage.name}`
+        : "",
+      repo.repositoryTopics?.length
+        ? `Topics: ${repo.repositoryTopics.map((t) => t.topic.name).join(", ")}`
+        : "",
+      `Stars: ${repo.stargazerCount}`,
+    ]
+      .filter(Boolean)
+      .join("\n");
     const text = sanitizeRetrievedText(
-      [repo.description, repo.object?.text].filter(Boolean).join("\n\n")
+      [meta, readme].filter(Boolean).join("\n\n")
     );
+    if (!text.trim()) continue;
+
     for (const chunk of chunkText(text)) {
       docs.push({
         id: docId(["github", repo.name, chunk.slice(0, 40)]),
@@ -161,8 +183,46 @@ async function loadGithubDocs(): Promise<KnowledgeDocument[]> {
   return docs;
 }
 
-function loadPrivateNotes(): KnowledgeDocument[] {
-  const dir = path.join(process.cwd(), ingestSourcesConfig.privateNotesDir);
+async function loadGithubActivityDoc(): Promise<KnowledgeDocument[]> {
+  const summary = await getGithubActivitySummary();
+  if (summary.error && summary.totalContributions == null) return [];
+
+  const text = sanitizeRetrievedText(
+    [
+      `GitHub user: ${summary.username}`,
+      summary.totalContributions != null
+        ? `Total contributions (last year): ${summary.totalContributions}`
+        : "",
+      summary.activeDaysLastYear != null
+        ? `Active days: ${summary.activeDaysLastYear}`
+        : "",
+      summary.recentStreakHint ?? "",
+    ]
+      .filter(Boolean)
+      .join("\n")
+  );
+
+  return [
+    {
+      id: docId(["github-activity"]),
+      text,
+      payload: {
+        source: "github",
+        title: "GitHub activity",
+        updated_at: new Date().toISOString(),
+        visibility: "public",
+        do_not_expose: false,
+        section: "activity",
+      },
+    },
+  ];
+}
+
+function loadMarkdownNotesDir(
+  relativeDir: string,
+  idPrefix: string
+): KnowledgeDocument[] {
+  const dir = path.join(process.cwd(), relativeDir);
   if (!fs.existsSync(dir)) return [];
 
   const docs: KnowledgeDocument[] = [];
@@ -176,7 +236,7 @@ function loadPrivateNotes(): KnowledgeDocument[] {
 
     for (const chunk of chunkText(sanitizeRetrievedText(body))) {
       docs.push({
-        id: docId(["notes", file, chunk.slice(0, 40)]),
+        id: docId([idPrefix, file, chunk.slice(0, 40)]),
         text: chunk,
         payload: {
           source: "notes",
@@ -184,6 +244,7 @@ function loadPrivateNotes(): KnowledgeDocument[] {
           updated_at: new Date().toISOString(),
           visibility: "public",
           do_not_expose: false,
+          section: idPrefix,
         },
       });
     }
@@ -191,19 +252,22 @@ function loadPrivateNotes(): KnowledgeDocument[] {
   return docs;
 }
 
+function loadPublicKnowledgeDocs(): KnowledgeDocument[] {
+  return loadMarkdownNotesDir(ingestSourcesConfig.publicNotesDir, "public");
+}
+
+function loadPrivateNotes(): KnowledgeDocument[] {
+  return loadMarkdownNotesDir(ingestSourcesConfig.privateNotesDir, "private");
+}
+
 async function loadResumeDocs(): Promise<KnowledgeDocument[]> {
   const pdfPath = ingestSourcesConfig.resumePdfPath;
   if (!pdfPath || !fs.existsSync(pdfPath)) return [];
 
-  const pdfMod = await import("pdf-parse");
-  const pdfParse =
-    typeof pdfMod === "function"
-      ? pdfMod
-      : (pdfMod as { default: (b: Buffer) => Promise<{ text: string }> }).default;
   const buffer = fs.readFileSync(pdfPath);
-  const parsed = await pdfParse(buffer);
+  const text = await parseResumePdf(buffer);
   const docs: KnowledgeDocument[] = [];
-  for (const chunk of chunkText(sanitizeRetrievedText(parsed.text))) {
+  for (const chunk of chunkText(sanitizeRetrievedText(text))) {
     docs.push({
       id: docId(["resume", chunk.slice(0, 40)]),
       text: chunk,
@@ -284,8 +348,11 @@ async function main() {
   console.log("Collecting documents…");
   const all = [
     ...loadPortfolioDocs(),
+    ...loadCareerDocs(),
+    ...loadPublicKnowledgeDocs(),
     ...(await loadMediumDocs()),
     ...(await loadGithubDocs()),
+    ...(await loadGithubActivityDoc()),
     ...loadPrivateNotes(),
     ...(await loadResumeDocs()),
     ...loadJsonExport(ingestSourcesConfig.linkedinExportPath, "linkedin"),

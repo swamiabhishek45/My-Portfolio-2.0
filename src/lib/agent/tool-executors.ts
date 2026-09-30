@@ -2,10 +2,17 @@ import { aboutBullets } from "@/data/about";
 import { books } from "@/data/books";
 import { overviewData } from "@/data/overview";
 import { skillMarqueeRows } from "@/data/technologies";
+import { getCareerForAgent } from "@/lib/agent/career-text";
 import { buildLocalPortfolioContext } from "@/lib/agent/local-context";
 import { formatContextBlock, searchKnowledge } from "@/lib/agent/rag/qdrant";
 import { rerankChunks } from "@/lib/agent/rag/rerank";
 import { sanitizeProfileForAgent } from "@/lib/agent/sanitize";
+import {
+  getGithubActivitySummary,
+  getGithubRepo,
+  listGithubRepos,
+  readmeExcerpt,
+} from "@/lib/integrations/github-agent";
 import { getGithubSummary } from "@/lib/integrations/github-summary";
 import { getSpotifyNowPlaying } from "@/lib/integrations/spotify";
 import { getWakaTimeToday } from "@/lib/integrations/wakatime";
@@ -18,9 +25,13 @@ export type AgentToolName =
   | "list_books"
   | "get_book"
   | "get_profile"
+  | "get_career"
   | "get_tech_stack"
   | "get_medium_posts"
   | "get_github_summary"
+  | "list_github_repos"
+  | "get_github_repo"
+  | "get_github_activity"
   | "get_spotify_now_playing"
   | "get_wakatime_today";
 
@@ -87,6 +98,7 @@ export async function executeAgentTool(
         about: aboutBullets.map((b) =>
           b.segments.map((s) => s.text).join("")
         ),
+        career: getCareerForAgent(),
         projects: getProjects().map((p) => ({
           slug: p.slug,
           name: p.name,
@@ -94,12 +106,56 @@ export async function executeAgentTool(
           tech: p.tech,
         })),
       };
+    case "get_career":
+      return getCareerForAgent();
     case "get_tech_stack":
       return skillMarqueeRows;
     case "get_medium_posts":
       return getCachedMediumPosts();
     case "get_github_summary":
       return getGithubSummary();
+    case "list_github_repos": {
+      const first = Number(args.first ?? 30);
+      const after =
+        typeof args.after === "string" ? args.after : undefined;
+      const page = await listGithubRepos({ first, after });
+      return {
+        username: page.username,
+        repos: page.repos.map((r) => ({
+          name: r.name,
+          description: r.description,
+          url: r.url,
+          stars: r.stargazerCount,
+          language: r.primaryLanguage?.name,
+          topics:
+            r.repositoryTopics?.map((t) => t.topic.name).filter(Boolean) ?? [],
+          updatedAt: r.updatedAt,
+        })),
+        pageInfo: page.pageInfo,
+        error: page.error,
+      };
+    }
+    case "get_github_repo": {
+      const name = String(args.name ?? "").trim();
+      if (!name) return { error: "Repository name required" };
+      const { repo, error } = await getGithubRepo(name);
+      if (!repo) return { error: error ?? "Not found" };
+      return {
+        name: repo.name,
+        description: repo.description,
+        url: repo.url,
+        homepageUrl: repo.homepageUrl,
+        stars: repo.stargazerCount,
+        forks: repo.forkCount,
+        language: repo.primaryLanguage?.name,
+        topics:
+          repo.repositoryTopics?.map((t) => t.topic.name).filter(Boolean) ?? [],
+        readmeExcerpt: readmeExcerpt(repo.readmeText, 2000),
+        updatedAt: repo.updatedAt,
+      };
+    }
+    case "get_github_activity":
+      return getGithubActivitySummary();
     case "get_spotify_now_playing":
       return getSpotifyNowPlaying();
     case "get_wakatime_today":

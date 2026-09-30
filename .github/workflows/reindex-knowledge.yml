@@ -19,5 +19,6 @@ jobs:
           QDRANT_URL: ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_USERNAME: ${{ vars.GITHUB_USERNAME }}
           MEDIUM_USERNAME: ${{ vars.MEDIUM_USERNAME }}
           RESUME_PDF_PATH: ${{ vars.RESUME_PDF_PATH }}
