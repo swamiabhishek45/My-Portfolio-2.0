@@ -165,7 +165,7 @@ function AgentPanelRuntime({
       <div className="flex min-h-0 flex-1 flex-col">
         <AuiIf condition={(s) => s.thread.capabilities.voice}>
           <div className="flex flex-col items-center gap-2 border-b px-4 py-4">
-            <VoiceOrb variant="emerald" className="size-28" />
+            <VoiceOrb variant="violet" className="size-28" />
             <VoiceControl />
           </div>
         </AuiIf>
