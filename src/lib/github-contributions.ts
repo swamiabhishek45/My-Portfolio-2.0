@@ -1,3 +1,5 @@
+import { parseISO } from "date-fns";
+
 import {
   activitiesToWeeks,
   extendWeeksToToday,
@@ -17,15 +19,49 @@ export {
   type ContributionWeek,
 } from "@/lib/github-contribution-calendar";
 
+export type ContributionYear = "last" | number;
+
+function contributionYearQuery(year: ContributionYear): string {
+  return year === "last" ? "last" : String(year);
+}
+
+function totalFromApiPayload(
+  data: { total?: Record<string, number> },
+  year: ContributionYear
+): number | undefined {
+  const total = data.total;
+  if (!total) return undefined;
+  if (year === "last") {
+    return total.lastYear ?? total.last;
+  }
+  return total[String(year)];
+}
+
+function endDateForActivities(
+  contributions: ContributionActivity[],
+  year: ContributionYear
+): Date | undefined {
+  if (contributions.length === 0) return undefined;
+  if (year === "last") return undefined;
+  const sorted = [...contributions].sort((a, b) =>
+    a.date.localeCompare(b.date)
+  );
+  return parseISO(sorted[sorted.length - 1].date);
+}
+
 async function fetchFromContributionsApi(
-  username: string
+  username: string,
+  year: ContributionYear = "last"
 ): Promise<ContributionCalendar> {
   const base =
     process.env.GITHUB_CONTRIBUTIONS_API_URL ??
     "https://github-contributions-api.jogruber.de";
-  const response = await fetch(`${base}/v4/${username}?y=last`, {
-    next: { revalidate: 3600 },
-  });
+  const response = await fetch(
+    `${base}/v4/${username}?y=${contributionYearQuery(year)}`,
+    {
+      next: { revalidate: 3600 },
+    }
+  );
 
   if (!response.ok) {
     throw new Error(`Contributions API responded with ${response.status}`);
@@ -33,13 +69,17 @@ async function fetchFromContributionsApi(
 
   const data = (await response.json()) as {
     contributions?: ContributionActivity[];
+    total?: Record<string, number>;
   };
   const contributions = data.contributions ?? [];
-  const weeks = extendWeeksToToday(activitiesToWeeks(contributions));
-  const totalContributions = contributions.reduce(
-    (sum, day) => sum + day.count,
-    0
-  );
+  const endDate = endDateForActivities(contributions, year);
+  let weeks = activitiesToWeeks(contributions, { endDate });
+  if (year === "last") {
+    weeks = extendWeeksToToday(weeks);
+  }
+  const totalContributions =
+    totalFromApiPayload(data, year) ??
+    contributions.reduce((sum, day) => sum + day.count, 0);
 
   return {
     weeks,
@@ -49,14 +89,22 @@ async function fetchFromContributionsApi(
 }
 
 async function fetchFromGitHubGraphQL(
-  username: string
+  username: string,
+  year: ContributionYear = "last"
 ): Promise<ContributionCalendar | null> {
   const token = process.env.GITHUB_TOKEN;
   if (!token) return null;
 
-  const to = new Date();
-  const from = new Date();
-  from.setFullYear(from.getFullYear() - 1);
+  let from: Date;
+  let to: Date;
+  if (year === "last") {
+    to = new Date();
+    from = new Date();
+    from.setFullYear(from.getFullYear() - 1);
+  } else {
+    from = new Date(year, 0, 1);
+    to = new Date(year, 11, 31, 23, 59, 59, 999);
+  }
 
   const query = `
     query {
@@ -93,7 +141,10 @@ async function fetchFromGitHubGraphQL(
 
   if (!calendar?.weeks) return null;
 
-  const weeks = extendWeeksToToday(calendar.weeks as ContributionWeek[]);
+  let weeks = calendar.weeks as ContributionWeek[];
+  if (year === "last") {
+    weeks = extendWeeksToToday(weeks);
+  }
 
   return {
     weeks,
@@ -103,10 +154,27 @@ async function fetchFromGitHubGraphQL(
 }
 
 export async function fetchGithubContributions(
-  username: string = GITHUB_USERNAME
+  username: string = GITHUB_USERNAME,
+  year: ContributionYear = currentContributionYear()
 ): Promise<ContributionCalendar> {
-  const fromGraphQL = await fetchFromGitHubGraphQL(username);
+  const fromGraphQL = await fetchFromGitHubGraphQL(username, year);
   if (fromGraphQL) return fromGraphQL;
 
-  return fetchFromContributionsApi(username);
+  return fetchFromContributionsApi(username, year);
+}
+
+export function currentContributionYear(): number {
+  return new Date().getFullYear();
+}
+
+export function parseContributionYearParam(
+  value: string | null
+): ContributionYear {
+  const fallback = currentContributionYear();
+  if (!value || value === "last") return fallback;
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed < 2008 || parsed > 2100) {
+    return fallback;
+  }
+  return parsed;
 }

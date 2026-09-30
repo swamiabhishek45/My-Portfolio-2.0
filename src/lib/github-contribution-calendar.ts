@@ -51,19 +51,27 @@ const MONTH_NAMES = [
   "December",
 ];
 
+const MONTH_SHORT = MONTH_NAMES.map((name) => name.slice(0, 3));
+
+export type ContributionMonthLabel = {
+  weekIndex: number;
+  label: string;
+};
+
 function todayDateString() {
   return format(startOfDay(new Date()), "yyyy-MM-dd");
 }
 
 function fillActivitiesThroughToday(
-  activities: ContributionActivity[]
+  activities: ContributionActivity[],
+  endDate?: Date
 ): ContributionActivity[] {
   if (activities.length === 0) return [];
 
   const sorted = [...activities].sort((a, b) => a.date.localeCompare(b.date));
   const byDate = new Map(activities.map((a) => [a.date, a]));
   const start = parseISO(sorted[0].date);
-  const end = startOfDay(new Date());
+  const end = endDate ?? startOfDay(new Date());
 
   return eachDayOfInterval({ start, end }).map((day) => {
     const date = format(day, "yyyy-MM-dd");
@@ -72,9 +80,10 @@ function fillActivitiesThroughToday(
 }
 
 export function activitiesToWeeks(
-  activities: ContributionActivity[]
+  activities: ContributionActivity[],
+  options?: { endDate?: Date }
 ): ContributionWeek[] {
-  const days = fillActivitiesThroughToday(activities);
+  const days = fillActivitiesThroughToday(activities, options?.endDate);
   if (days.length === 0) return [];
 
   const weeks: ContributionWeek[] = [];
@@ -168,4 +177,39 @@ export function monthsFromWeeks(weeks: ContributionWeek[]): ContributionMonth[] 
   }
 
   return months;
+}
+
+export function monthLabelsFromWeeks(
+  weeks: ContributionWeek[]
+): ContributionMonthLabel[] {
+  const labels = weeks.reduce<ContributionMonthLabel[]>(
+    (acc, week, weekIndex) => {
+      const first = week.contributionDays[0];
+      if (!first) return acc;
+
+      const label = MONTH_SHORT[getMonth(parseISO(first.date))];
+      const prev = acc.at(-1);
+
+      if (weekIndex === 0 || !prev || prev.label !== label) {
+        acc.push({ weekIndex, label });
+      }
+
+      return acc;
+    },
+    []
+  );
+
+  return labels.filter(({ weekIndex }, index, all) => {
+    const minWeeks = 3;
+
+    if (index === 0) {
+      return Boolean(all[1] && all[1].weekIndex - weekIndex >= minWeeks);
+    }
+
+    if (index === all.length - 1) {
+      return weeks.slice(weekIndex).length >= minWeeks;
+    }
+
+    return true;
+  });
 }

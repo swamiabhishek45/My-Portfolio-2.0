@@ -26,9 +26,22 @@ export function getQdrantClient(): QdrantClient | null {
     qdrant = new QdrantClient({
       url,
       apiKey: process.env.QDRANT_API_KEY,
+      checkCompatibility: false,
     });
   }
   return qdrant;
+}
+
+async function collectionExists(
+  client: QdrantClient,
+  collection: string
+): Promise<boolean> {
+  try {
+    const { collections } = await client.getCollections();
+    return collections.some((c) => c.name === collection);
+  } catch {
+    return false;
+  }
 }
 
 export async function ensureCollection(collection = COLLECTION_NAME): Promise<void> {
@@ -86,6 +99,11 @@ export async function searchKnowledge(
   if (!client) return [];
 
   const collection = opts?.collection ?? COLLECTION_NAME;
+
+  if (!(await collectionExists(client, collection))) {
+    return [];
+  }
+
   const vector = await embedQuery(query);
 
   let results: Awaited<ReturnType<typeof client.query>>["points"];
@@ -103,8 +121,7 @@ export async function searchKnowledge(
       with_payload: true,
     });
     results = response.points;
-  } catch (error) {
-    console.warn("Qdrant search unavailable, using local fallback:", error);
+  } catch {
     return [];
   }
 
