@@ -17,6 +17,7 @@ import {
   getConversationHistory,
   recordUserMessage,
 } from "@/lib/agent/quota";
+import { buildLocalPortfolioContext } from "@/lib/agent/local-context";
 import { formatContextBlock, searchKnowledge } from "@/lib/agent/rag/qdrant";
 import { rerankChunks } from "@/lib/agent/rag/rerank";
 import { checkAgentRateLimit } from "@/lib/agent/rate-limit";
@@ -128,7 +129,13 @@ export async function POST(request: Request) {
   const chunks = userText
     ? rerankChunks(await searchKnowledge(userText))
     : [];
-  const retrievedContext = sanitizeRetrievedText(formatContextBlock(chunks));
+  const retrievedContext = sanitizeRetrievedText(
+    chunks.length > 0
+      ? formatContextBlock(chunks)
+      : userText
+        ? buildLocalPortfolioContext()
+        : ""
+  );
   const history = await getConversationHistory(visitorId);
 
   const result = streamText({

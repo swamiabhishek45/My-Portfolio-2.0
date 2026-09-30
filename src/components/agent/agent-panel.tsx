@@ -23,6 +23,7 @@ type QuotaState = {
   remainingFree: number;
   paidUntil: number | null;
   canSend: boolean;
+  quotaDisabled?: boolean;
 };
 
 type AgentPanelProps = {
@@ -52,9 +53,11 @@ export function AgentPanel({ open, onOpenChange }: AgentPanelProps) {
   const quotaLabel =
     quota == null
       ? "Loading quota…"
-      : quota.paidUntil && quota.paidUntil > Date.now()
-        ? "Paid session active"
-        : `${quota.remainingFree} free question${quota.remainingFree === 1 ? "" : "s"} left`;
+      : quota.quotaDisabled
+        ? "Unlimited messages while building"
+        : quota.paidUntil && quota.paidUntil > Date.now()
+          ? "Paid session active"
+          : `${quota.remainingFree} free question${quota.remainingFree === 1 ? "" : "s"} left`;
 
   return (
     <>

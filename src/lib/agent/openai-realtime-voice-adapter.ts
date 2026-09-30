@@ -166,7 +166,35 @@ export class OpenAIRealtimeVoiceAdapter implements RealtimeVoiceAdapter {
 
             delta?: string;
 
+            name?: string;
+
+            call_id?: string;
+
+            arguments?: string;
+
           };
+
+
+
+          if (msg.type === "response.function_call_arguments.done") {
+
+            if (msg.name && msg.call_id) {
+
+              void handleRealtimeToolCall(
+
+                dc,
+
+                msg.name,
+
+                msg.call_id,
+
+                msg.arguments ?? "{}"
+
+              );
+
+            }
+
+          }
 
 
 
@@ -489,6 +517,88 @@ export class OpenAIRealtimeVoiceAdapter implements RealtimeVoiceAdapter {
       );
 
     }
+
+  }
+
+}
+
+
+
+async function handleRealtimeToolCall(
+
+  dc: RTCDataChannel,
+
+  name: string,
+
+  callId: string,
+
+  argumentsJson: string
+
+) {
+
+  let args: Record<string, unknown> = {};
+
+  try {
+
+    args = JSON.parse(argumentsJson) as Record<string, unknown>;
+
+  } catch {
+
+    /* use empty args */
+
+  }
+
+
+
+  try {
+
+    const res = await fetch("/api/agent/tools", {
+
+      method: "POST",
+
+      headers: { "Content-Type": "application/json" },
+
+      body: JSON.stringify({ name, arguments: args }),
+
+    });
+
+    const payload = res.ok
+
+      ? ((await res.json()) as { result?: unknown })
+
+      : { result: { error: "Tool request failed" } };
+
+    const output = payload.result ?? { error: "Empty tool result" };
+
+
+
+    if (dc.readyState !== "open") return;
+
+    dc.send(
+
+      JSON.stringify({
+
+        type: "conversation.item.create",
+
+        item: {
+
+          type: "function_call_output",
+
+          call_id: callId,
+
+          output: JSON.stringify(output),
+
+        },
+
+      })
+
+    );
+
+    dc.send(JSON.stringify({ type: "response.create" }));
+
+  } catch (error) {
+
+    console.error("[voice] tool call failed", name, error);
 
   }
 

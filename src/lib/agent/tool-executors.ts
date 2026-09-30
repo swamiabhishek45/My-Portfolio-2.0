@@ -2,6 +2,7 @@ import { aboutBullets } from "@/data/about";
 import { books } from "@/data/books";
 import { overviewData } from "@/data/overview";
 import { skillMarqueeRows } from "@/data/technologies";
+import { buildLocalPortfolioContext } from "@/lib/agent/local-context";
 import { formatContextBlock, searchKnowledge } from "@/lib/agent/rag/qdrant";
 import { rerankChunks } from "@/lib/agent/rag/rerank";
 import { sanitizeProfileForAgent } from "@/lib/agent/sanitize";
@@ -31,6 +32,10 @@ export async function executeAgentTool(
     case "search_knowledge": {
       const query = String(args.query ?? "");
       const chunks = rerankChunks(await searchKnowledge(query));
+      const context =
+        chunks.length > 0
+          ? formatContextBlock(chunks)
+          : buildLocalPortfolioContext();
       return {
         snippets: chunks.map((c) => ({
           text: c.text,
@@ -38,7 +43,8 @@ export async function executeAgentTool(
           url: c.payload.url,
           source: c.payload.source,
         })),
-        context: formatContextBlock(chunks),
+        context,
+        source: chunks.length > 0 ? "qdrant" : "local_portfolio_data",
       };
     }
     case "get_project": {
@@ -81,6 +87,12 @@ export async function executeAgentTool(
         about: aboutBullets.map((b) =>
           b.segments.map((s) => s.text).join("")
         ),
+        projects: getProjects().map((p) => ({
+          slug: p.slug,
+          name: p.name,
+          shortDescription: p.shortDescription,
+          tech: p.tech,
+        })),
       };
     case "get_tech_stack":
       return skillMarqueeRows;

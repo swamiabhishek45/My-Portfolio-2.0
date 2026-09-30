@@ -61,12 +61,18 @@ export const agentToolDefinitions = {
   }),
 };
 
-/** OpenAI Realtime function schemas (shared shape). */
+const emptyObjectSchema = {
+  type: "object" as const,
+  properties: {},
+};
+
+/** OpenAI Realtime function schemas — same capabilities as text chat tools. */
 export const realtimeToolSchemas = [
   {
     type: "function" as const,
     name: "search_knowledge",
-    description: "Search public knowledge about Abhishek.",
+    description:
+      "Search Abhishek's portfolio knowledge (projects, skills, bio, books).",
     parameters: {
       type: "object",
       properties: { query: { type: "string" } },
@@ -75,20 +81,64 @@ export const realtimeToolSchemas = [
   },
   {
     type: "function" as const,
-    name: "get_spotify_now_playing",
-    description: "Current Spotify track",
-    parameters: { type: "object", properties: {} },
+    name: "get_project",
+    description: "Get one portfolio project by slug or name.",
+    parameters: {
+      type: "object",
+      properties: { slugOrName: { type: "string" } },
+      required: ["slugOrName"],
+    },
   },
   {
     type: "function" as const,
-    name: "get_wakatime_today",
-    description: "WakaTime stats today",
-    parameters: { type: "object", properties: {} },
+    name: "list_books",
+    description: "List books on Abhishek's reading list.",
+    parameters: emptyObjectSchema,
+  },
+  {
+    type: "function" as const,
+    name: "get_book",
+    description: "Get one book by slug.",
+    parameters: {
+      type: "object",
+      properties: { slug: { type: "string" } },
+      required: ["slug"],
+    },
   },
   {
     type: "function" as const,
     name: "get_profile",
-    description: "Public profile",
-    parameters: { type: "object", properties: {} },
+    description: "Profile, bio, and project summaries.",
+    parameters: emptyObjectSchema,
+  },
+  {
+    type: "function" as const,
+    name: "get_tech_stack",
+    description: "Skills and technologies.",
+    parameters: emptyObjectSchema,
+  },
+  {
+    type: "function" as const,
+    name: "get_medium_posts",
+    description: "Recent Medium posts.",
+    parameters: emptyObjectSchema,
+  },
+  {
+    type: "function" as const,
+    name: "get_github_summary",
+    description: "GitHub repos and README highlights.",
+    parameters: emptyObjectSchema,
+  },
+  {
+    type: "function" as const,
+    name: "get_spotify_now_playing",
+    description: "Current or recent Spotify track.",
+    parameters: emptyObjectSchema,
+  },
+  {
+    type: "function" as const,
+    name: "get_wakatime_today",
+    description: "WakaTime coding activity today.",
+    parameters: emptyObjectSchema,
   },
 ];

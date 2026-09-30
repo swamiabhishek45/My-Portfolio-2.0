@@ -1,6 +1,14 @@
 import { kvGet, kvIncr, kvSet, kvExpire } from "@/lib/agent/memory-store";
 
 export const FREE_MESSAGE_LIMIT = 3;
+
+/** Unlimited messages while building locally; set AGENT_QUOTA_DISABLED=false in prod. */
+export function isQuotaDisabled(): boolean {
+  const flag = process.env.AGENT_QUOTA_DISABLED?.trim().toLowerCase();
+  if (flag === "true" || flag === "1" || flag === "yes") return true;
+  if (flag === "false" || flag === "0" || flag === "no") return false;
+  return process.env.NODE_ENV === "development";
+}
 export const PAID_SESSION_SECONDS = 3600;
 export const PAID_HOURLY_MSG_CAP = 200;
 export const HISTORY_TTL_SECONDS = 60 * 60 * 24;
@@ -14,6 +22,7 @@ export type QuotaStatus = {
   remainingFree: number;
   paidUntil: number | null;
   canSend: boolean;
+  quotaDisabled?: boolean;
   reason?: "QUOTA_EXCEEDED" | "RATE_ABUSE";
 };
 
@@ -27,6 +36,17 @@ function keys(visitorId: string) {
 }
 
 export async function getQuotaStatus(visitorId: string): Promise<QuotaStatus> {
+  if (isQuotaDisabled()) {
+    return {
+      visitorId,
+      freeUsed: 0,
+      remainingFree: 999,
+      paidUntil: null,
+      canSend: true,
+      quotaDisabled: true,
+    };
+  }
+
   const k = keys(visitorId);
   const [freeRaw, paidRaw] = await Promise.all([
     kvGet(k.free),
@@ -52,6 +72,10 @@ export async function getQuotaStatus(visitorId: string): Promise<QuotaStatus> {
 export async function assertCanSendMessage(
   visitorId: string
 ): Promise<QuotaStatus> {
+  if (isQuotaDisabled()) {
+    return getQuotaStatus(visitorId);
+  }
+
   const status = await getQuotaStatus(visitorId);
   if (!status.canSend) {
     return { ...status, reason: "QUOTA_EXCEEDED" };
@@ -73,6 +97,8 @@ export async function assertCanSendMessage(
 }
 
 export async function recordUserMessage(visitorId: string): Promise<void> {
+  if (isQuotaDisabled()) return;
+
   const k = keys(visitorId);
   const status = await getQuotaStatus(visitorId);
   const now = Date.now();

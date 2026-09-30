@@ -70,18 +70,18 @@ export function TextFlip({
   const items = Children.toArray(children)
 
   useEffect(() => {
+    onIndexChange?.(currentIndex)
+  }, [currentIndex, onIndexChange])
+
+  useEffect(() => {
     if (!play) return
 
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => {
-        const next = (prev + 1) % items.length
-        onIndexChange?.(next)
-        return next
-      })
+      setCurrentIndex((prev) => (prev + 1) % items.length)
     }, interval * 1000)
 
     return () => clearInterval(timer)
-  }, [play, interval, items.length, onIndexChange])
+  }, [play, interval, items.length])
 
   return (
     <AnimatePresence mode="wait" initial={false}>
