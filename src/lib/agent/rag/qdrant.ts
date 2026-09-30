@@ -88,22 +88,27 @@ export async function searchKnowledge(
   const collection = opts?.collection ?? COLLECTION_NAME;
   const vector = await embedQuery(query);
 
-  const response = await client.query(collection, {
-    query: vector,
-    limit: opts?.limit ?? TOP_K,
-    score_threshold: SCORE_THRESHOLD,
-    filter: {
-      must: [
-        { key: "visibility", match: { value: "public" } },
-        { key: "do_not_expose", match: { value: false } },
-      ],
-    },
-    with_payload: true,
-  });
+  let results: Awaited<ReturnType<typeof client.query>>["points"];
+  try {
+    const response = await client.query(collection, {
+      query: vector,
+      limit: opts?.limit ?? TOP_K,
+      score_threshold: SCORE_THRESHOLD,
+      filter: {
+        must: [
+          { key: "visibility", match: { value: "public" } },
+          { key: "do_not_expose", match: { value: false } },
+        ],
+      },
+      with_payload: true,
+    });
+    results = response.points;
+  } catch (error) {
+    console.warn("Qdrant search unavailable, using local fallback:", error);
+    return [];
+  }
 
-  const results = response.points ?? [];
-
-  return results
+  return (results ?? [])
     .map((r) => {
       const payload = (r.payload ?? {}) as Record<string, unknown>;
       const text = sanitizeRetrievedText(String(payload.text ?? ""));

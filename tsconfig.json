@@ -22,16 +22,9 @@
         "name": "next"
       }
     ],
-    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"
-      ],
-      "@ai-sdk/openai": [
-        "./node_modules/@ai-sdk/openai/dist/index.d.ts"
-      ],
-      "@ai-sdk/openai/*": [
-        "./node_modules/@ai-sdk/openai/dist/*"
       ]
     }
   },

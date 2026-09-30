@@ -1,4 +1,4 @@
-import { openai } from "@/lib/agent/openai-provider";
+import { openai } from "@ai-sdk/openai";
 import {
   convertToModelMessages,
   isStepCount,
