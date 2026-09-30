@@ -5,6 +5,7 @@ import { WordsPreloaderGate } from "@/components/words-preloader";
 import { Analytics } from "@vercel/analytics/next";
 import { GeistPixelGrid, GeistPixelSquare } from "geist/font/pixel";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AgentFab } from "@/components/agent/agent-fab";
 
 export const metadata: Metadata = {
   title: "Abhishek Swami",
@@ -41,10 +42,11 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <TooltipProvider>
-              <WordsPreloaderGate>
+              {/* <WordsPreloaderGate> */}
                 {children}
+                <AgentFab />
                 <Analytics />
-              </WordsPreloaderGate>
+              {/* </WordsPreloaderGate> */}
             </TooltipProvider>
           </ThemeProvider>
         </body>

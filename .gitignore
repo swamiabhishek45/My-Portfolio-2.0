@@ -33,6 +33,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# agent private knowledge (never commit)
+/knowledge/private/
+
 # vercel
 .vercel
 
