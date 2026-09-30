@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { GeistPixelGrid, GeistPixelSquare } from "geist/font/pixel";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AgentFab } from "@/components/agent/agent-fab";
+import { WalkingAvatar } from "@/components/walking-avatar";
 
 export const metadata: Metadata = {
   title: "Abhishek Swami",
@@ -44,6 +45,7 @@ export default function RootLayout({
             <TooltipProvider>
               {/* <WordsPreloaderGate> */}
                 {children}
+                {/* <WalkingAvatar /> */}
                 <AgentFab />
                 <Analytics />
               {/* </WordsPreloaderGate> */}
