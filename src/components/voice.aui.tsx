@@ -4,6 +4,10 @@ import { TooltipIconButton } from "@/components/tooltip-icon-button";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
+  useAgentSessionDownload,
+  useAgentSessionExport,
+} from "@/components/agent/agent-session-export";
+import {
   AuiIf,
   useAuiState,
   useVoiceControls,
@@ -136,11 +140,19 @@ export const VoiceMuteButton: FC = () => {
 
 export const VoiceDisconnectButton: FC = () => {
   const { disconnect } = useVoiceControls();
+  const exportSession = useAgentSessionExport();
+  const { downloadOnCloseEnabled } = useAgentSessionDownload();
   return (
     <TooltipIconButton
-      tooltip="Disconnect"
+      tooltip={
+        downloadOnCloseEnabled
+          ? "End voice & save resume + chat to your device"
+          : "End voice"
+      }
       className="aui-voice-disconnect text-destructive hover:text-destructive"
-      onClick={() => disconnect()}
+      onClick={() => {
+        void exportSession().finally(() => disconnect());
+      }}
     >
       <PhoneOffIcon />
     </TooltipIconButton>

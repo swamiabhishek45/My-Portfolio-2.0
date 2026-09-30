@@ -4,7 +4,7 @@ import { useChatRuntime } from "@assistant-ui/ai-sdk";
 import { AssistantRuntimeProvider, AuiIf } from "@assistant-ui/react";
 import { DefaultChatTransport } from "ai";
 import { X } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { PaywallModal } from "@/components/agent/paywall-modal";
 import { Thread } from "@/components/thread.aui";
@@ -17,6 +17,13 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { AgentDownloadToggle } from "@/components/agent/agent-download-toggle";
+import {
+  AgentSessionDownloadProvider,
+  AgentSessionExportProvider,
+  RegisterAgentSessionExport,
+  type AgentSessionExportFn,
+} from "@/components/agent/agent-session-export";
 import { OpenAIRealtimeVoiceAdapter } from "@/lib/agent/openai-realtime-voice-adapter";
 
 type QuotaState = {
@@ -35,6 +42,17 @@ export function AgentPanel({ open, onOpenChange }: AgentPanelProps) {
   const [quota, setQuota] = useState<QuotaState | null>(null);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [voiceError, setVoiceError] = useState<string | null>(null);
+  const exportSessionRef = useRef<AgentSessionExportFn>(async () => {});
+
+  const handleOpenChange = useCallback(
+    (next: boolean) => {
+      if (!next) {
+        void exportSessionRef.current();
+      }
+      onOpenChange(next);
+    },
+    [onOpenChange]
+  );
 
   const refreshQuota = useCallback(async () => {
     const res = await fetch("/api/quota");
@@ -61,7 +79,8 @@ export function AgentPanel({ open, onOpenChange }: AgentPanelProps) {
 
   return (
     <>
-      <Sheet open={open} onOpenChange={onOpenChange}>
+      <AgentSessionDownloadProvider>
+      <Sheet open={open} onOpenChange={handleOpenChange}>
         <SheetContent
           side="right"
           className="flex w-full flex-col gap-0 p-0 sm:max-w-md"
@@ -79,12 +98,13 @@ export function AgentPanel({ open, onOpenChange }: AgentPanelProps) {
                 variant="ghost"
                 size="icon-sm"
                 className="shrink-0"
-                onClick={() => onOpenChange(false)}
+                onClick={() => handleOpenChange(false)}
                 aria-label="Close"
               >
                 <X className="size-4" />
               </Button>
             </div>
+            <AgentDownloadToggle />
             <p className="text-xs text-muted-foreground">{quotaLabel}</p>
             {voiceError ? (
               <p className="text-xs text-destructive" role="alert">
@@ -99,10 +119,14 @@ export function AgentPanel({ open, onOpenChange }: AgentPanelProps) {
               onPaywall={() => setPaywallOpen(true)}
               onFinish={() => void refreshQuota()}
               onVoiceError={setVoiceError}
+              onRegisterExport={(fn) => {
+                exportSessionRef.current = fn;
+              }}
             />
           ) : null}
         </SheetContent>
       </Sheet>
+      </AgentSessionDownloadProvider>
 
       <PaywallModal
         open={paywallOpen}
@@ -121,11 +145,13 @@ function AgentPanelRuntime({
   onPaywall,
   onFinish,
   onVoiceError,
+  onRegisterExport,
 }: {
   quota: QuotaState | null;
   onPaywall: () => void;
   onFinish: () => void;
   onVoiceError: (message: string | null) => void;
+  onRegisterExport: (fn: AgentSessionExportFn) => void;
 }) {
   const voiceAdapter = useMemo(
     () =>
@@ -162,17 +188,20 @@ function AgentPanelRuntime({
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <div className="flex min-h-0 flex-1 flex-col">
-        <AuiIf condition={(s) => s.thread.capabilities.voice}>
-          <div className="flex flex-col items-center gap-2 border-b px-4 py-4">
-            <VoiceOrb variant="violet" className="size-28" />
-            <VoiceControl />
+      <AgentSessionExportProvider>
+        <RegisterAgentSessionExport onRegister={onRegisterExport} />
+        <div className="flex min-h-0 flex-1 flex-col">
+          <AuiIf condition={(s) => s.thread.capabilities.voice}>
+            <div className="flex flex-col items-center gap-2 border-b px-4 py-4">
+              <VoiceOrb variant="violet" className="size-28" />
+              <VoiceControl />
+            </div>
+          </AuiIf>
+          <div className="min-h-0 flex-1 px-2 pb-2">
+            <Thread />
           </div>
-        </AuiIf>
-        <div className="min-h-0 flex-1 px-2 pb-2">
-          <Thread />
         </div>
-      </div>
+      </AgentSessionExportProvider>
     </AssistantRuntimeProvider>
   );
 }
