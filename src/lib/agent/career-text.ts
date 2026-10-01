@@ -57,6 +57,16 @@ export function formatCareerAsText(data: CareerData = careerData): string {
     "Recruiter FAQ:",
     ...data.recruiterFaq.map((f) => `Q: ${f.question}\nA: ${f.answer}`),
     "",
+    "Stack profile — primary strengths:",
+    ...data.stackProfile.primaryStrengths.map((s) => `- ${s}`),
+    "Limited experience:",
+    ...data.stackProfile.limitedExperience.map(
+      (x) => `- ${x.technology}: ${x.honestLevel}`
+    ),
+    "Not in production stack (willing to learn):",
+    data.stackProfile.notInProductionStack.join(", "),
+    `Learning stance: ${data.stackProfile.learningStance}`,
+    "",
     `Priority GitHub repos: ${data.prioritizedGithubRepos.join(", ")}`,
     `GitHub: ${data.githubUrl}`,
     `LeetCode: ${data.leetCodeUrl}`,

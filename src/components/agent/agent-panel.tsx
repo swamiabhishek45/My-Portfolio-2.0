@@ -89,9 +89,9 @@ export function AgentPanel({ open, onOpenChange }: AgentPanelProps) {
             <div className="flex items-start justify-between gap-2">
               <div>
                 <SheetTitle>Chat with Abhishek</SheetTitle>
-                <SheetDescription className="text-xs">
+                {/* <SheetDescription className="text-xs">
                   First-person answers about my work — text or voice.
-                </SheetDescription>
+                </SheetDescription> */}
               </div>
               <Button
                 type="button"

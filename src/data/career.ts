@@ -58,6 +58,12 @@ export interface CareerData {
   leetCodeUrl: string;
   githubUrl: string;
   topicsToAvoid: string[];
+  stackProfile: {
+    primaryStrengths: string[];
+    limitedExperience: { technology: string; honestLevel: string }[];
+    notInProductionStack: string[];
+    learningStance: string;
+  };
 }
 
 /** Public, recruiter-safe career knowledge — mirrored in knowledge/public/*.md */
@@ -263,6 +269,16 @@ export const careerData: CareerData = {
       answer:
         "Challenging engineering and AI problems, learning from experienced devs, practical AI products — not surface-level AI features only.",
     },
+    {
+      question: "Do you know Java / Go / Rust / Kubernetes?",
+      answer:
+        "Not in production today — my shipped work is mainly TypeScript, Node, and Next.js. I am honest about that. I am happy to learn on the job: I pick up stacks quickly by building small features and reading official docs, the same way I went deep on RAG and agents.",
+    },
+    {
+      question: "How strong is your Python?",
+      answer:
+        "Limited compared to TypeScript — I have used Python for learning and small scripts, not as my primary stack at work. For a Python-heavy role I would be transparent and ramp with mentorship and deliberate practice.",
+    },
   ],
   prioritizedGithubRepos: [
     "OpenBook",
@@ -274,4 +290,36 @@ export const careerData: CareerData = {
     "Private or sensitive personal information",
     "Keep conversation on professional work, projects, and technical interests",
   ],
+  stackProfile: {
+    primaryStrengths: [
+      "TypeScript / JavaScript",
+      "Next.js & React",
+      "Node.js & Express",
+      "MongoDB & PostgreSQL (incl. pgvector)",
+      "RAG, AI agents, LLM tool calling, vector DBs",
+      "Docker, CI/CD, Vercel",
+    ],
+    limitedExperience: [
+      {
+        technology: "Python",
+        honestLevel:
+          "Some exposure (scripts, small experiments, AI/ML tutorials) — not my day-to-day production language. I can ramp up quickly because my core work is backend + APIs + system thinking in TypeScript.",
+      },
+      {
+        technology: "C++",
+        honestLevel:
+          "Academic and DSA background — comfortable with fundamentals, not shipping C++ services professionally.",
+      },
+    ],
+    notInProductionStack: [
+      "Java",
+      "Go",
+      "Rust",
+      "Kotlin",
+      "Kubernetes (K8s) at production operator level",
+      "Spring / enterprise Java ecosystems",
+    ],
+    learningStance:
+      "If a role needs a stack I have not used in production, I am upfront about it. I learn by reading docs, building a small proof-of-concept, and pairing with the team — I have done this repeatedly when picking up GenAI, vector DBs, and new cloud tooling. I do not claim expert-level experience I do not have.",
+  },
 };
