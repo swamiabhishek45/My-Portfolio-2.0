@@ -19,10 +19,10 @@ export interface OverviewData {
 export const overviewData: OverviewData = {
   roles: [
     { title: "Full Stack GenAI Engineer", iconName: "code" },
-    { title: "Full Stack Developer @ One Union Solutions", iconName: "globe" },
+    { title: "Full Stack Developer", iconName: "globe" },
   ],
   location: "Pune, Maharashtra, India",
-  phone: "+91 8956* *****",
+  phone: "+91 8956008591",
   phoneRaw: "tel:+918956008591",
   email: "abhishekswami1435@gmail.com",
   website: "swamiabhishek.online",

@@ -2,9 +2,9 @@
  * Run: npx tsx scripts/ingest-knowledge.ts
  * Requires: OPENAI_API_KEY, QDRANT_URL, QDRANT_API_KEY (optional locally)
  */
-import fs from "fs";
-import path from "path";
-import { createHash } from "crypto";
+import { createHash } from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
 
 import { formatCareerAsText } from "../src/lib/agent/career-text";
 import { parseResumePdf } from "../src/lib/agent/parse-resume-pdf";
