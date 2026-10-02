@@ -28,6 +28,12 @@ export const FAVORITE_MEDIA: FavoriteMediaCategory[] = [
         director: "Anthony & Joe Russo",
         poster: "/favourites/infinity-war.png",
       },
+      {
+        title: "Spider-Man: Across the Spider-Verse",
+        year: 2023,
+        director: "Joaquim Dos Santos, Kemp Powers & Justin K. Thompson",
+        poster: "/favourites/spider-man.png",
+      },
     ],
   },
   {
