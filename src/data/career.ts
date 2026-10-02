@@ -279,6 +279,11 @@ export const careerData: CareerData = {
       answer:
         "Limited compared to TypeScript — I have used Python for learning and small scripts, not as my primary stack at work. For a Python-heavy role I would be transparent and ramp with mentorship and deliberate practice.",
     },
+    {
+      question: "Can you send me your resume / CV?",
+      answer:
+        "Turn on the Save on close toggle at the top of this chat (the download switch). With it on, when you close the panel or end voice, your browser downloads my resume PDF and this conversation as a text file. I can also walk you through my experience here — just ask.",
+    },
   ],
   prioritizedGithubRepos: [
     "OpenBook",

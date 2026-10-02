@@ -2,18 +2,16 @@
 
 import { useChatRuntime } from "@assistant-ui/ai-sdk";
 import { AssistantRuntimeProvider, AuiIf } from "@assistant-ui/react";
+import type { ToolCallMessagePartComponent } from "@assistant-ui/react";
 import { DefaultChatTransport } from "ai";
-import { X } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FC, type PropsWithChildren } from "react";
 
 import { PaywallModal } from "@/components/agent/paywall-modal";
-import { Thread } from "@/components/thread.aui";
+import { Thread, type ThreadGroupPart } from "@/components/thread.aui";
 import { VoiceControl, VoiceOrb } from "@/components/voice.aui";
-import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -37,6 +35,21 @@ type AgentPanelProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
+
+/** Recruiters see answers only — not internal tool names or args. */
+const HiddenToolCall: ToolCallMessagePartComponent = () => null;
+
+const HiddenToolGroup: FC<
+  PropsWithChildren<{ group: ThreadGroupPart }>
+> = () => null;
+
+const AGENT_THREAD_COMPONENTS = {
+  ToolFallback: HiddenToolCall,
+  ToolGroup: HiddenToolGroup,
+};
+
+const AGENT_THREAD_SCROLL_AREA =
+  "agent-panel-thread-scroll min-h-0 flex-1 px-2 pb-2";
 
 export function AgentPanel({ open, onOpenChange }: AgentPanelProps) {
   const [quota, setQuota] = useState<QuotaState | null>(null);
@@ -68,44 +81,18 @@ export function AgentPanel({ open, onOpenChange }: AgentPanelProps) {
     }
   }, [open, refreshQuota]);
 
-  const quotaLabel =
-    quota == null
-      ? "Loading quota…"
-      : quota.quotaDisabled
-        ? "Unlimited messages while building"
-        : quota.paidUntil && quota.paidUntil > Date.now()
-          ? "Paid session active"
-          : `${quota.remainingFree} free question${quota.remainingFree === 1 ? "" : "s"} left`;
-
   return (
     <>
       <AgentSessionDownloadProvider>
       <Sheet open={open} onOpenChange={handleOpenChange}>
         <SheetContent
           side="right"
-          className="flex w-full flex-col gap-0 p-0 sm:max-w-md"
+          showCloseButton
+          className="flex w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-md"
         >
-          <SheetHeader className="border-b px-4 py-3 text-left">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <SheetTitle>Chat with Abhishek</SheetTitle>
-                {/* <SheetDescription className="text-xs">
-                  First-person answers about my work — text or voice.
-                </SheetDescription> */}
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                className="shrink-0"
-                onClick={() => handleOpenChange(false)}
-                aria-label="Close"
-              >
-                <X className="size-4" />
-              </Button>
-            </div>
+          <SheetHeader className="space-y-3 border-b px-4 py-3 pr-12 text-left">
+            <SheetTitle className="text-base">Chat with Abhishek</SheetTitle>
             <AgentDownloadToggle />
-            <p className="text-xs text-muted-foreground">{quotaLabel}</p>
             {voiceError ? (
               <p className="text-xs text-destructive" role="alert">
                 {voiceError}
@@ -197,8 +184,8 @@ function AgentPanelRuntime({
               <VoiceControl />
             </div>
           </AuiIf>
-          <div className="min-h-0 flex-1 px-2 pb-2">
-            <Thread />
+          <div className={AGENT_THREAD_SCROLL_AREA}>
+            <Thread components={AGENT_THREAD_COMPONENTS} />
           </div>
         </div>
       </AgentSessionExportProvider>

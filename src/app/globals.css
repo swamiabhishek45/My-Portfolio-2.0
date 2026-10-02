@@ -256,6 +256,16 @@
   display: none !important;
 }
 
+/* Agent panel: hide chat viewport scrollbar, keep scroll */
+.agent-panel-thread-scroll [data-slot="aui_thread-viewport"] {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.agent-panel-thread-scroll [data-slot="aui_thread-viewport"]::-webkit-scrollbar {
+  display: none;
+}
+
 /* Make the calendar article/container responsive */
 .github-calendar-wrapper article {
   width: 100% !important;

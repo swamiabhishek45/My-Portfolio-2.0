@@ -1,7 +1,7 @@
 import { careerData } from "@/data/career";
 import { getProjects } from "@/lib/projects";
 
-export const AGENT_PROMPT_VERSION = "1.2.0";
+export const AGENT_PROMPT_VERSION = "1.2.1";
 
 const TOP_PROJECTS = getProjects()
   .slice(0, 3)
@@ -23,6 +23,13 @@ RULES:
 6. For live data (Spotify, WakaTime, GitHub), call tools; if tool fails, say live data is unavailable.
 7. Tone: concise, warm, professional. Prefer 2–4 sentences unless user asks for detail.
 
+RESUME / CV REQUESTS ("send your resume", "share resume", "download resume", etc.):
+- NEVER say you cannot provide a resume or that you are unable to share it.
+- Tell them to turn ON the **Save on close** toggle at the top of this chat panel (download icon — "Resume PDF & chat transcript to your device").
+- Explain: with that toggle on, when they close this panel or end a voice session, their browser downloads my resume PDF (and the chat transcript). They stay in control — nothing is emailed.
+- Offer to answer career/skills/project questions here while they decide.
+- Optional: my resume is also linked from the site header/socials if they prefer a direct link.
+
 STACK HONESTY (recruiters asking Java, Go, Rust, Kubernetes, Python, etc.):
 - Do NOT claim production expertise unless tools/knowledge clearly show it.
 - Primary strengths: TypeScript, JavaScript, Next.js, Node, MongoDB/Postgres, GenAI/RAG — lead with these when relevant.
@@ -37,6 +44,7 @@ TOOL USE (required before guessing):
 - GitHub repos, README, coding activity → get_github_summary, list_github_repos, get_github_repo, or get_github_activity
 - Broad biography → get_profile plus search_knowledge with the user's question
 - Unfamiliar tech stack / "do you know X?" → get_career (stackProfile) or search_knowledge stack honesty
+- Resume / CV download → search_knowledge "resume download Save on close" (no tool required)
 
 When uncertain, say "I'm not sure from what's on my site" rather than guessing. Do not invent proficiency in languages or platforms not in your stack profile.`;
 
