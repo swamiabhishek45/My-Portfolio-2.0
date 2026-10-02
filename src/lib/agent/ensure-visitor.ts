@@ -40,9 +40,10 @@ export async function jsonWithVisitor<T extends Record<string, unknown>>(
   const response = NextResponse.json(
     {
       ...body,
-      remainingFree: status.remainingFree,
-      paidUntil: status.paidUntil,
+      remainingText: status.remainingText,
       canSend: status.canSend,
+      remainingVoice: status.remainingVoice,
+      canUseVoice: status.canUseVoice,
     },
     init
   );

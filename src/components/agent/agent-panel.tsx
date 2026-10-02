@@ -6,7 +6,10 @@ import type { ToolCallMessagePartComponent } from "@assistant-ui/react";
 import { DefaultChatTransport } from "ai";
 import { useCallback, useEffect, useMemo, useRef, useState, type FC, type PropsWithChildren } from "react";
 
-import { PaywallModal } from "@/components/agent/paywall-modal";
+import {
+  AgentLimitModal,
+  type AgentLimitKind,
+} from "@/components/agent/agent-limit-modal";
 import { Thread, type ThreadGroupPart } from "@/components/thread.aui";
 import { VoiceControl, VoiceOrb } from "@/components/voice.aui";
 import {
@@ -22,13 +25,16 @@ import {
   RegisterAgentSessionExport,
   type AgentSessionExportFn,
 } from "@/components/agent/agent-session-export";
+import { isPublicAgentVoiceEnabled } from "@/lib/agent/agent-client-config";
 import { OpenAIRealtimeVoiceAdapter } from "@/lib/agent/openai-realtime-voice-adapter";
 
 type QuotaState = {
-  remainingFree: number;
-  paidUntil: number | null;
+  remainingText: number;
+  remainingVoice: number;
   canSend: boolean;
+  canUseVoice: boolean;
   quotaDisabled?: boolean;
+  voiceEnabled?: boolean;
 };
 
 type AgentPanelProps = {
@@ -49,13 +55,28 @@ const AGENT_THREAD_COMPONENTS = {
 };
 
 const AGENT_THREAD_SCROLL_AREA =
-  "agent-panel-thread-scroll min-h-0 flex-1 px-2 pb-2";
+  "agent-panel-thread-scroll min-h-0 flex-1 overflow-hidden px-2 pb-2";
+
+function quotaLabel(quota: QuotaState | null): string {
+  if (quota == null) return "Loading quota…";
+  if (quota.quotaDisabled) return "Unlimited in dev mode";
+  const text = `${quota.remainingText} text message${quota.remainingText === 1 ? "" : "s"} left`;
+  if (!quota.voiceEnabled) return text;
+  const voice = `${quota.remainingVoice} voice message${quota.remainingVoice === 1 ? "" : "s"} left`;
+  return `${text} · ${voice}`;
+}
 
 export function AgentPanel({ open, onOpenChange }: AgentPanelProps) {
   const [quota, setQuota] = useState<QuotaState | null>(null);
-  const [paywallOpen, setPaywallOpen] = useState(false);
+  const [limitOpen, setLimitOpen] = useState(false);
+  const [limitKind, setLimitKind] = useState<AgentLimitKind>("text");
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const exportSessionRef = useRef<AgentSessionExportFn>(async () => {});
+
+  const openLimit = useCallback((kind: AgentLimitKind) => {
+    setLimitKind(kind);
+    setLimitOpen(true);
+  }, []);
 
   const handleOpenChange = useCallback(
     (next: boolean) => {
@@ -92,6 +113,9 @@ export function AgentPanel({ open, onOpenChange }: AgentPanelProps) {
         >
           <SheetHeader className="space-y-3 border-b px-4 py-3 pr-12 text-left">
             <SheetTitle className="text-base">Chat with Abhishek</SheetTitle>
+            <p className="text-xs text-muted-foreground">
+              {quotaLabel(quota)}
+            </p>
             <AgentDownloadToggle />
             {voiceError ? (
               <p className="text-xs text-destructive" role="alert">
@@ -103,8 +127,10 @@ export function AgentPanel({ open, onOpenChange }: AgentPanelProps) {
           {open ? (
             <AgentPanelRuntime
               quota={quota}
-              onPaywall={() => setPaywallOpen(true)}
+              onTextLimit={() => openLimit("text")}
+              onVoiceLimit={() => openLimit("voice")}
               onFinish={() => void refreshQuota()}
+              refreshQuota={refreshQuota}
               onVoiceError={setVoiceError}
               onRegisterExport={(fn) => {
                 exportSessionRef.current = fn;
@@ -115,13 +141,10 @@ export function AgentPanel({ open, onOpenChange }: AgentPanelProps) {
       </Sheet>
       </AgentSessionDownloadProvider>
 
-      <PaywallModal
-        open={paywallOpen}
-        onOpenChange={setPaywallOpen}
-        onUnlocked={() => {
-          void refreshQuota();
-          setPaywallOpen(false);
-        }}
+      <AgentLimitModal
+        open={limitOpen}
+        onOpenChange={setLimitOpen}
+        kind={limitKind}
       />
     </>
   );
@@ -129,25 +152,33 @@ export function AgentPanel({ open, onOpenChange }: AgentPanelProps) {
 
 function AgentPanelRuntime({
   quota,
-  onPaywall,
+  onTextLimit,
+  onVoiceLimit,
   onFinish,
+  refreshQuota,
   onVoiceError,
   onRegisterExport,
 }: {
   quota: QuotaState | null;
-  onPaywall: () => void;
+  onTextLimit: () => void;
+  onVoiceLimit: () => void;
   onFinish: () => void;
+  refreshQuota: () => Promise<void>;
   onVoiceError: (message: string | null) => void;
   onRegisterExport: (fn: AgentSessionExportFn) => void;
 }) {
+  const voiceEnabled =
+    isPublicAgentVoiceEnabled() && (quota?.voiceEnabled ?? false);
+
   const voiceAdapter = useMemo(
     () =>
       new OpenAIRealtimeVoiceAdapter({
-        canConnect: () => quota?.canSend ?? true,
-        onQuotaExceeded: onPaywall,
+        canConnect: () => quota?.canUseVoice ?? true,
+        onQuotaExceeded: onVoiceLimit,
+        onVoiceTurnRecorded: () => void refreshQuota(),
         onError: (message) => onVoiceError(message),
       }),
-    [quota, onPaywall, onVoiceError]
+    [quota, onVoiceLimit, onVoiceError, refreshQuota]
   );
 
   const transport = useMemo(
@@ -157,20 +188,20 @@ function AgentPanelRuntime({
         fetch: async (input, init) => {
           const res = await fetch(input, init);
           if (res.status === 402) {
-            onPaywall();
+            onTextLimit();
           }
           return res;
         },
       }),
-    [onPaywall]
+    [onTextLimit]
   );
 
   const runtime = useChatRuntime({
     transport,
     onFinish,
-    adapters: {
-      voice: voiceAdapter,
-    },
+    ...(voiceEnabled
+      ? { adapters: { voice: voiceAdapter } }
+      : {}),
   });
 
   return (
@@ -178,12 +209,14 @@ function AgentPanelRuntime({
       <AgentSessionExportProvider>
         <RegisterAgentSessionExport onRegister={onRegisterExport} />
         <div className="flex min-h-0 flex-1 flex-col">
-          <AuiIf condition={(s) => s.thread.capabilities.voice}>
-            <div className="flex flex-col items-center gap-2 border-b px-4 py-4">
-              <VoiceOrb variant="violet" className="size-28" />
-              <VoiceControl />
-            </div>
-          </AuiIf>
+          {voiceEnabled ? (
+            <AuiIf condition={(s) => s.thread.capabilities.voice}>
+              <div className="flex flex-col items-center gap-2 border-b px-4 py-4">
+                <VoiceOrb variant="violet" className="size-28" />
+                <VoiceControl />
+              </div>
+            </AuiIf>
+          ) : null}
           <div className={AGENT_THREAD_SCROLL_AREA}>
             <Thread components={AGENT_THREAD_COMPONENTS} />
           </div>

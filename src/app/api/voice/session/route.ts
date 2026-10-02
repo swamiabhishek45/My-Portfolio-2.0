@@ -10,7 +10,9 @@ import {
 
 } from "@/lib/agent/ensure-visitor";
 
-import { assertCanSendMessage } from "@/lib/agent/quota";
+import { isAgentVoiceEnabled } from "@/lib/agent/agent-config";
+
+import { assertCanUseVoice } from "@/lib/agent/quota";
 
 import { postRealtimeCall } from "@/lib/agent/realtime-call";
 
@@ -72,6 +74,26 @@ function buildRealtimeSessionConfig() {
 
 export async function POST(request: Request) {
 
+  if (!isAgentVoiceEnabled()) {
+
+    return NextResponse.json(
+
+      {
+
+        error:
+
+          "Voice chat is disabled on this site. Use text chat or email me.",
+
+      },
+
+      { status: 503 }
+
+    );
+
+  }
+
+
+
   const { visitorId, setCookie, cookieValue } = await ensureVisitorId();
 
 
@@ -86,13 +108,13 @@ export async function POST(request: Request) {
 
 
 
-  const gate = await assertCanSendMessage(visitorId);
+  const gate = await assertCanUseVoice(visitorId);
 
-  if (!gate.canSend) {
+  if (!gate.canUseVoice) {
 
     const response = NextResponse.json(
 
-      { code: gate.reason ?? "QUOTA_EXCEEDED" },
+      { code: gate.reason ?? "VOICE_QUOTA_EXCEEDED" },
 
       { status: 402 }
 

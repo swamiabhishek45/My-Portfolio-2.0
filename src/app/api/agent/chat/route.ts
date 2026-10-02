@@ -82,7 +82,7 @@ export async function POST(request: Request) {
   const gate = await assertCanSendMessage(visitorId);
   if (!gate.canSend && userText) {
     const response = NextResponse.json(
-      { code: gate.reason ?? "QUOTA_EXCEEDED", ...gate },
+      { code: gate.reason ?? "TEXT_QUOTA_EXCEEDED", ...gate },
       { status: 402 }
     );
     if (setCookie && cookieValue) attachVisitorCookie(response, cookieValue);

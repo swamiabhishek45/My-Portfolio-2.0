@@ -7,7 +7,9 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "ingest:knowledge": "tsx scripts/ingest-knowledge.ts"
+    "ingest": "tsx scripts/ingest-knowledge.ts",
+    "docker": "docker compose -f docker/docker-compose.qdrant.yml up -d",
+    "docker:down": "docker compose -f docker/docker-compose.qdrant.yml down"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.82",
@@ -40,7 +42,6 @@
     "openai": "^7.25.0",
     "pdf-parse": "^2.4.5",
     "radix-ui": "^1.6.4",
-    "razorpay": "^2.9.8",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-github-calendar": "^4.5.11",

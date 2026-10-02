@@ -35,9 +35,9 @@ do_not_expose: false
 
 Never ingest `visibility: private` or `do_not_expose: true`.
 
-## Razorpay webhook
+## Visitor limits
 
-Point webhook to `https://your-domain/api/billing/webhook` for event `payment.captured`. Payment notes must include `visitor_id` (set on order creation).
+Per visitor (cookie): **10 text messages** and **3 voice user turns** (`src/lib/agent/quota.ts`). When a limit is hit, the UI shows Email / LinkedIn — no payments.
 
 ## Vercel env
 
@@ -50,6 +50,19 @@ Redis and Qdrant must be reachable from Vercel (HTTPS + auth for Qdrant).
 | `GITHUB_TOKEN` | Live GitHub tools + richer ingest (public repo read) |
 | `GITHUB_USERNAME` | Defaults to `swamiabhishek45` |
 | `KNOWLEDGE_COLLECTION` | Optional; default `abhishek_knowledge_v1` |
+| `AGENT_VOICE_ENABLED` / `NEXT_PUBLIC_AGENT_VOICE_ENABLED` | Realtime voice (default off in prod) |
+| `AGENT_QUOTA_DISABLED` | Set `false` in production (enforces 10 text + 3 voice limits) |
+
+### Production cost profile (recommended)
+
+```env
+AGENT_VOICE_ENABLED=false
+NEXT_PUBLIC_AGENT_VOICE_ENABLED=false
+AGENT_QUOTA_DISABLED=false
+AGENT_CHAT_MODEL=gpt-4o-mini
+```
+
+Visitors get capped demo chat; limits show **Email / LinkedIn**.
 
 ## Recruiter knowledge checklist
 

@@ -256,14 +256,25 @@
   display: none !important;
 }
 
-/* Agent panel: hide chat viewport scrollbar, keep scroll */
-.agent-panel-thread-scroll [data-slot="aui_thread-viewport"] {
-  scrollbar-width: none;
+/* Agent panel: hide scrollbars, keep scroll (viewport + nested overflow) */
+.agent-panel-thread-scroll,
+.agent-panel-thread-scroll [data-slot="aui_thread-viewport"],
+.agent-panel-thread-scroll [data-slot="aui_thread-root"] {
+  scrollbar-width: none !important;
   -ms-overflow-style: none;
 }
 
-.agent-panel-thread-scroll [data-slot="aui_thread-viewport"]::-webkit-scrollbar {
-  display: none;
+.agent-panel-thread-scroll [data-slot="aui_thread-viewport"] {
+  overflow-y: auto;
+}
+
+.agent-panel-thread-scroll::-webkit-scrollbar,
+.agent-panel-thread-scroll [data-slot="aui_thread-viewport"]::-webkit-scrollbar,
+.agent-panel-thread-scroll [data-slot="aui_thread-root"]::-webkit-scrollbar,
+.agent-panel-thread-scroll *::-webkit-scrollbar {
+  display: none !important;
+  width: 0;
+  height: 0;
 }
 
 /* Make the calendar article/container responsive */

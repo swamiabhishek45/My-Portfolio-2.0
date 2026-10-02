@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { isAgentVoiceEnabled } from "@/lib/agent/agent-config";
 import {
   attachVisitorCookie,
   ensureVisitorId,
@@ -13,10 +14,14 @@ export async function GET() {
   const status = await getQuotaStatus(visitorId);
 
   const response = NextResponse.json({
-    remainingFree: status.remainingFree,
-    freeUsed: status.freeUsed,
-    paidUntil: status.paidUntil,
+    textUsed: status.textUsed,
+    remainingText: status.remainingText,
     canSend: status.canSend,
+    voiceUsed: status.voiceUsed,
+    remainingVoice: status.remainingVoice,
+    canUseVoice: status.canUseVoice,
+    quotaDisabled: status.quotaDisabled ?? false,
+    voiceEnabled: isAgentVoiceEnabled(),
   });
 
   if (setCookie && cookieValue) {

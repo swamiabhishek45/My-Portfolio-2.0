@@ -46,7 +46,7 @@ export default function RootLayout({
               {/* <WordsPreloaderGate> */}
                 {children}
                 {/* <WalkingAvatar /> */}
-                <AgentFab />
+                {/* <AgentFab /> */}
                 <Analytics />
               {/* </WordsPreloaderGate> */}
             </TooltipProvider>

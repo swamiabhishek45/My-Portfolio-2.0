@@ -18,6 +18,8 @@ export type OpenAIRealtimeVoiceAdapterOptions = {
 
   onQuotaExceeded?: () => void;
 
+  onVoiceTurnRecorded?: () => void;
+
   onError?: (message: string) => void;
 
 };
@@ -140,7 +142,13 @@ export class OpenAIRealtimeVoiceAdapter implements RealtimeVoiceAdapter {
 
       const volumeLoop = startVolumeMeter(stream, helpers);
 
+      let sessionEnded = false;
+      let disconnectSession: (() => void) | null = null;
 
+      const hitVoiceQuotaLimit = () => {
+        disconnectSession?.();
+        this.options.onQuotaExceeded?.();
+      };
 
       const dc = pc.createDataChannel("oai-events");
 
@@ -214,9 +222,27 @@ export class OpenAIRealtimeVoiceAdapter implements RealtimeVoiceAdapter {
 
               body: JSON.stringify({ kind: "voice_user_turn" }),
 
-            }).then((r) => {
+            }).then(async (r) => {
 
-              if (r.status === 402) this.options.onQuotaExceeded?.();
+              if (r.status === 402) {
+
+                hitVoiceQuotaLimit();
+
+                return;
+
+              }
+
+              if (!r.ok) return;
+
+              const body = (await r.json()) as { canUseVoice?: boolean };
+
+              this.options.onVoiceTurnRecorded?.();
+
+              if (body.canUseVoice === false) {
+
+                hitVoiceQuotaLimit();
+
+              }
 
             });
 
@@ -462,6 +488,10 @@ export class OpenAIRealtimeVoiceAdapter implements RealtimeVoiceAdapter {
 
       const disconnect = () => {
 
+        if (sessionEnded) return;
+
+        sessionEnded = true;
+
         volumeLoop.stop();
 
         dc.close();
@@ -472,9 +502,13 @@ export class OpenAIRealtimeVoiceAdapter implements RealtimeVoiceAdapter {
 
         audio.srcObject = null;
 
+        audio.pause();
+
         helpers.end("finished");
 
       };
+
+      disconnectSession = disconnect;
 
 
 

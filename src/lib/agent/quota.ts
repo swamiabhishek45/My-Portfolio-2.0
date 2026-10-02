@@ -1,16 +1,22 @@
-import { kvGet, kvIncr, kvSet, kvExpire } from "@/lib/agent/memory-store";
+import { kvGet, kvIncr, kvSet } from "@/lib/agent/memory-store";
 
-export const FREE_MESSAGE_LIMIT = 3;
+export const FREE_MESSAGE_LIMIT = 10;
+export const FREE_VOICE_LIMIT = 3;
 
-/** Unlimited messages while building locally; set AGENT_QUOTA_DISABLED=false in prod. */
+/** Unlimited text while building locally; set AGENT_QUOTA_DISABLED=false on Vercel prod. */
 export function isQuotaDisabled(): boolean {
   const flag = process.env.AGENT_QUOTA_DISABLED?.trim().toLowerCase();
   if (flag === "true" || flag === "1" || flag === "yes") return true;
   if (flag === "false" || flag === "0" || flag === "no") return false;
   return process.env.NODE_ENV === "development";
 }
-export const PAID_SESSION_SECONDS = 3600;
-export const PAID_HOURLY_MSG_CAP = 200;
+
+/** Voice cap (3 turns) always applies in production; dev follows AGENT_QUOTA_DISABLED. */
+export function isVoiceQuotaDisabled(): boolean {
+  if (process.env.NODE_ENV === "production") return false;
+  return isQuotaDisabled();
+}
+
 export const HISTORY_TTL_SECONDS = 60 * 60 * 24;
 export const MAX_HISTORY_TURNS = 20;
 
@@ -18,54 +24,65 @@ export type ChatTurn = { role: "user" | "assistant"; content: string };
 
 export type QuotaStatus = {
   visitorId: string;
-  freeUsed: number;
-  remainingFree: number;
-  paidUntil: number | null;
+  textUsed: number;
+  remainingText: number;
   canSend: boolean;
+  voiceUsed: number;
+  remainingVoice: number;
+  canUseVoice: boolean;
   quotaDisabled?: boolean;
-  reason?: "QUOTA_EXCEEDED" | "RATE_ABUSE";
+  reason?: "TEXT_QUOTA_EXCEEDED" | "VOICE_QUOTA_EXCEEDED";
 };
 
 function keys(visitorId: string) {
   return {
-    free: `agent:${visitorId}:free_used`,
-    paid: `agent:${visitorId}:paid_until`,
-    hour: `agent:${visitorId}:msgs_hour`,
+    text: `agent:${visitorId}:text_used`,
+    voice: `agent:${visitorId}:voice_used`,
     history: `agent:${visitorId}:history`,
   };
 }
 
 export async function getQuotaStatus(visitorId: string): Promise<QuotaStatus> {
-  if (isQuotaDisabled()) {
+  const textUnlimited = isQuotaDisabled();
+  const voiceUnlimited = isVoiceQuotaDisabled();
+
+  if (textUnlimited && voiceUnlimited) {
     return {
       visitorId,
-      freeUsed: 0,
-      remainingFree: 999,
-      paidUntil: null,
+      textUsed: 0,
+      remainingText: 999,
       canSend: true,
+      voiceUsed: 0,
+      remainingVoice: 999,
+      canUseVoice: true,
       quotaDisabled: true,
     };
   }
 
   const k = keys(visitorId);
-  const [freeRaw, paidRaw] = await Promise.all([
-    kvGet(k.free),
-    kvGet(k.paid),
+  const [textRaw, voiceRaw] = await Promise.all([
+    textUnlimited ? Promise.resolve(null) : kvGet(k.text),
+    voiceUnlimited ? Promise.resolve(null) : kvGet(k.voice),
   ]);
-  const freeUsed = freeRaw ? parseInt(freeRaw, 10) : 0;
-  const paidUntil = paidRaw ? parseInt(paidRaw, 10) : null;
-  const now = Date.now();
-  const isPaid = paidUntil != null && paidUntil > now;
-  const remainingFree = Math.max(0, FREE_MESSAGE_LIMIT - freeUsed);
-  const canSend = isPaid || remainingFree > 0;
+  const textUsed = textRaw ? parseInt(textRaw, 10) : 0;
+  const voiceUsed = voiceRaw ? parseInt(voiceRaw, 10) : 0;
+  const remainingText = textUnlimited
+    ? 999
+    : Math.max(0, FREE_MESSAGE_LIMIT - textUsed);
+  const remainingVoice = voiceUnlimited
+    ? 999
+    : Math.max(0, FREE_VOICE_LIMIT - voiceUsed);
 
   return {
     visitorId,
-    freeUsed,
-    remainingFree,
-    paidUntil: isPaid ? paidUntil : paidUntil && paidUntil <= now ? null : paidUntil,
-    canSend,
-    reason: canSend ? undefined : "QUOTA_EXCEEDED",
+    textUsed,
+    remainingText,
+    canSend: textUnlimited || remainingText > 0,
+    voiceUsed,
+    remainingVoice,
+    canUseVoice: voiceUnlimited || remainingVoice > 0,
+    quotaDisabled: textUnlimited && voiceUnlimited,
+    reason: undefined,
   };
 }
 
@@ -75,45 +92,34 @@ export async function assertCanSendMessage(
   if (isQuotaDisabled()) {
     return getQuotaStatus(visitorId);
   }
-
   const status = await getQuotaStatus(visitorId);
   if (!status.canSend) {
-    return { ...status, reason: "QUOTA_EXCEEDED" };
+    return { ...status, reason: "TEXT_QUOTA_EXCEEDED" };
   }
+  return status;
+}
 
-  const now = Date.now();
-  if (status.paidUntil && status.paidUntil > now) {
-    const k = keys(visitorId);
-    const hourCount = await kvIncr(k.hour);
-    if (hourCount === 1) {
-      await kvExpire(k.hour, 3600);
-    }
-    if (hourCount > PAID_HOURLY_MSG_CAP) {
-      return { ...status, canSend: false, reason: "RATE_ABUSE" };
-    }
+export async function assertCanUseVoice(
+  visitorId: string
+): Promise<QuotaStatus> {
+  if (isVoiceQuotaDisabled()) {
+    return getQuotaStatus(visitorId);
   }
-
+  const status = await getQuotaStatus(visitorId);
+  if (!status.canUseVoice) {
+    return { ...status, reason: "VOICE_QUOTA_EXCEEDED" };
+  }
   return status;
 }
 
 export async function recordUserMessage(visitorId: string): Promise<void> {
   if (isQuotaDisabled()) return;
-
-  const k = keys(visitorId);
-  const status = await getQuotaStatus(visitorId);
-  const now = Date.now();
-  const isPaid = status.paidUntil != null && status.paidUntil > now;
-
-  if (!isPaid) {
-    await kvIncr(k.free);
-  }
+  await kvIncr(keys(visitorId).text);
 }
 
-export async function grantPaidSession(visitorId: string): Promise<number> {
-  const k = keys(visitorId);
-  const until = Date.now() + PAID_SESSION_SECONDS * 1000;
-  await kvSet(k.paid, String(until));
-  return until;
+export async function recordVoiceTurn(visitorId: string): Promise<void> {
+  if (isVoiceQuotaDisabled()) return;
+  await kvIncr(keys(visitorId).voice);
 }
 
 export async function getConversationHistory(
