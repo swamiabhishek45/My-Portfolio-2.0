@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, type CSSProperties } from "react";
 import { Lightbulb, User, Globe } from "lucide-react";
 import { overviewData } from "@/data/overview";
 import SocialLinks from "@/components/social-links";
 import { MapPinIcon } from "@/components/ui/map-pin";
-import { PhoneIcon } from "@/components/ui/phone";
 import { AtSignIcon } from "@/components/ui/at-sign";
 import { LinkIcon } from "@/components/ui/link";
 import { ClockIcon } from "@/components/ui/clock";
@@ -91,7 +90,6 @@ export default function Overview() {
   const [timeDiff, setTimeDiff] = useState("");
 
   const mapPinRef = useRef<any>(null);
-  const phoneRef = useRef<any>(null);
   const linkRef = useRef<any>(null);
   const clockRef = useRef<any>(null);
   const emailRef = useRef<any>(null);
@@ -135,100 +133,89 @@ export default function Overview() {
     return () => clearInterval(timer);
   }, []);
 
+  const roleRowCount = overviewData.roles.length;
+
   return (
     <section className="flex flex-col w-full">
       {/* Outer Card Wrapper */}
       <div className="border border-dotted border-neutral-300 dark:border-neutral-800/80 rounded-2xl bg-neutral-50/10 dark:bg-neutral-900/10 overflow-hidden font-mono">
-        {/* Columns Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 p-5 gap-y-4 relative">
-          {/* Dashed vertical separator (visible on md+) */}
-          <div className="hidden md:block absolute top-5 bottom-5 left-1/2 -translate-x-1/2 border-r border-dotted border-neutral-300 dark:border-neutral-800/80" />
+        {/* Paired rows on desktop; single column on mobile */}
+        <div
+          className="overview-details-grid relative grid grid-cols-1 gap-4 p-5 md:grid-cols-2 md:gap-x-10 md:gap-y-4"
+          style={
+            {
+              "--overview-role-rows": roleRowCount,
+            } as CSSProperties
+          }
+        >
+          <div className="pointer-events-none absolute top-5 bottom-5 left-1/2 hidden -translate-x-1/2 border-r border-dotted border-neutral-300 dark:border-neutral-800/80 md:block" />
 
-          {/* Left Column */}
-          <div className="flex flex-col gap-4">
-            {/* Roles */}
-            {overviewData.roles.map((role, idx) => (
-              <RoleItem key={idx} role={role} />
-            ))}
-
-            {/* Location */}
+          {overviewData.roles.map((role, row) => (
             <div
-              className="flex items-center gap-3 cursor-default"
-              onMouseEnter={() => mapPinRef.current?.startAnimation()}
-              onMouseLeave={() => mapPinRef.current?.stopAnimation()}
+              key={role.title}
+              className="overview-role min-h-9"
+              data-role-index={row + 1}
             >
-              <OverviewIcon icon={MapPinIcon} iconRef={mapPinRef} />
-              <span className="text-neutral-800 dark:text-neutral-200 font-medium text-sm sm:text-base">
-                {overviewData.location}
-              </span>
+              <RoleItem role={role} />
             </div>
+          ))}
 
-            {/* Phone */}
-            <div className="flex items-center gap-3">
-              <OverviewIcon icon={PhoneIcon} iconRef={phoneRef} />
-              <a
-                href={overviewData.phoneRaw}
-                onMouseEnter={() => phoneRef.current?.startAnimation()}
-                onMouseLeave={() => phoneRef.current?.stopAnimation()}
-                className="text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white font-medium text-sm sm:text-base transition-colors"
-              >
-                {overviewData.phone}
-              </a>
-            </div>
-
-            {/* Website */}
-            <div className="flex items-center gap-3">
-              <OverviewIcon icon={LinkIcon} iconRef={linkRef} />
-              <a
-                href={overviewData.websiteRaw}
-                target="_blank"
-                rel="noopener noreferrer"
-                onMouseEnter={() => linkRef.current?.startAnimation()}
-                onMouseLeave={() => linkRef.current?.stopAnimation()}
-                className="text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white font-medium text-sm sm:text-base transition-colors"
-              >
-                {overviewData.website}
-              </a>
-            </div>
+          <div
+            className="overview-loc flex min-h-9 items-center gap-3"
+            onMouseEnter={() => mapPinRef.current?.startAnimation()}
+            onMouseLeave={() => mapPinRef.current?.stopAnimation()}
+          >
+            <OverviewIcon icon={MapPinIcon} iconRef={mapPinRef} />
+            <span className="text-neutral-800 dark:text-neutral-200 font-medium text-sm sm:text-base">
+              {overviewData.location}
+            </span>
           </div>
 
-          {/* Right Column */}
-          <div className="flex flex-col gap-4 md:pl-6">
-            {/* Desktop Placeholders */}
-            <div className="hidden md:block h-8" />
-
-            {/* Local Time */}
-            <div
-              className="flex items-center gap-3 cursor-default"
-              onMouseEnter={() => clockRef.current?.startAnimation()}
-              onMouseLeave={() => clockRef.current?.stopAnimation()}
+          <div className="overview-web flex min-h-9 items-center gap-3">
+            <OverviewIcon icon={LinkIcon} iconRef={linkRef} />
+            <a
+              href={overviewData.websiteRaw}
+              target="_blank"
+              rel="noopener noreferrer"
+              onMouseEnter={() => linkRef.current?.startAnimation()}
+              onMouseLeave={() => linkRef.current?.stopAnimation()}
+              className="text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white font-medium text-sm sm:text-base transition-colors"
             >
-              <OverviewIcon icon={ClockIcon} iconRef={clockRef} />
-              <span className="text-neutral-800 dark:text-neutral-200 font-medium text-sm sm:text-base">
-                {time || "00:00"} <span className="text-neutral-500 dark:text-neutral-400 font-normal">// {timeDiff}</span>
-              </span>
-            </div>
+              {overviewData.website}
+            </a>
+          </div>
 
-            {/* Email */}
-            <div className="flex items-center gap-3">
-              <OverviewIcon icon={AtSignIcon} iconRef={emailRef} />
-              <a
-                href={`mailto:${overviewData.email}`}
-                onMouseEnter={() => emailRef.current?.startAnimation()}
-                onMouseLeave={() => emailRef.current?.stopAnimation()}
-                className="text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white font-medium text-sm sm:text-base transition-colors break-all"
-              >
-                {overviewData.email}
-              </a>
-            </div>
-
-            {/* Gender */}
-            <div className="flex items-center gap-3">
-              <OverviewIcon icon={MaleIcon} />
-              <span className="text-neutral-800 dark:text-neutral-200 font-medium text-sm sm:text-base">
-                {overviewData.gender}
+          <div
+            className="overview-time flex min-h-9 items-center gap-3"
+            onMouseEnter={() => clockRef.current?.startAnimation()}
+            onMouseLeave={() => clockRef.current?.stopAnimation()}
+          >
+            <OverviewIcon icon={ClockIcon} iconRef={clockRef} />
+            <span className="text-neutral-800 dark:text-neutral-200 font-medium text-sm sm:text-base">
+              {time || "00:00"}{" "}
+              <span className="font-normal text-neutral-500 dark:text-neutral-400">
+                // {timeDiff}
               </span>
-            </div>
+            </span>
+          </div>
+
+          <div className="overview-email flex min-h-9 items-center gap-3">
+            <OverviewIcon icon={AtSignIcon} iconRef={emailRef} />
+            <a
+              href={`mailto:${overviewData.email}`}
+              onMouseEnter={() => emailRef.current?.startAnimation()}
+              onMouseLeave={() => emailRef.current?.stopAnimation()}
+              className="break-all text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white font-medium text-sm sm:text-base transition-colors"
+            >
+              {overviewData.email}
+            </a>
+          </div>
+
+          <div className="overview-gender flex min-h-9 items-center gap-3">
+            <OverviewIcon icon={MaleIcon} />
+            <span className="text-neutral-800 dark:text-neutral-200 font-medium text-sm sm:text-base">
+              {overviewData.gender}
+            </span>
           </div>
         </div>
 

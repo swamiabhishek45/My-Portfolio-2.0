@@ -256,6 +256,46 @@
   display: none !important;
 }
 
+/* Overview: paired columns on desktop, natural stack on mobile */
+@media (min-width: 768px) {
+  .overview-details-grid .overview-role {
+    grid-column: 1;
+  }
+
+  .overview-details-grid .overview-role[data-role-index="1"] {
+    grid-row: 1;
+  }
+
+  .overview-details-grid .overview-role[data-role-index="2"] {
+    grid-row: 2;
+  }
+
+  .overview-details-grid .overview-loc {
+    grid-column: 1;
+    grid-row: calc(var(--overview-role-rows, 1) + 1);
+  }
+
+  .overview-details-grid .overview-web {
+    grid-column: 1;
+    grid-row: calc(var(--overview-role-rows, 1) + 2);
+  }
+
+  .overview-details-grid .overview-time {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .overview-details-grid .overview-email {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .overview-details-grid .overview-gender {
+    grid-column: 2;
+    grid-row: 3;
+  }
+}
+
 /* Agent panel: hide scrollbars, keep scroll (viewport + nested overflow) */
 .agent-panel-thread-scroll,
 .agent-panel-thread-scroll [data-slot="aui_thread-viewport"],

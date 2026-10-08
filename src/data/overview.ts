@@ -7,8 +7,6 @@ export interface Role {
 export interface OverviewData {
   roles: Role[];
   location: string;
-  phone: string;
-  phoneRaw: string;
   email: string;
   website: string;
   websiteRaw: string;
@@ -17,13 +15,8 @@ export interface OverviewData {
 }
 
 export const overviewData: OverviewData = {
-  roles: [
-    { title: "Full Stack GenAI Engineer", iconName: "code" },
-    { title: "Full Stack Developer", iconName: "globe" },
-  ],
+  roles: [{ title: "Full Stack GenAI Engineer", iconName: "code" }],
   location: "Pune, Maharashtra, India",
-  phone: "+91 8956008591",
-  phoneRaw: "tel:+918956008591",
   email: "abhishekswami1435@gmail.com",
   website: "swamiabhishek.online",
   websiteRaw: "https://github.com/swamiabhishek45",
