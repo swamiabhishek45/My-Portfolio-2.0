@@ -16,6 +16,7 @@ import {
   Glasses,
 } from "lucide-react";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+import { LineHoverLink } from "@/components/ui/line-hover-link";
 import { MobiusLoopIcon } from "@/components/mobius-loop-icon";
 import { cn } from "@/lib/utils";
 
@@ -40,10 +41,10 @@ const SECTIONS: SectionItem[] = [
 ];
 
 const activeNavClass =
-  "text-neutral-900 dark:text-neutral-100 font-semibold underline underline-offset-4 decoration-2 decoration-neutral-900 dark:decoration-neutral-100 hover:opacity-80 transition-opacity";
+  "text-neutral-900 dark:text-neutral-100 font-semibold hover:opacity-90";
 
 const inactiveNavClass =
-  "hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors";
+  "text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100";
 
 export default function Navbar() {
   const router = useRouter();
@@ -111,8 +112,9 @@ export default function Navbar() {
       </a>
 
       <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300">
-        <a
+        <LineHoverLink
           href="/"
+          variant="slide"
           onClick={(e) => {
             e.preventDefault();
             router.push("/");
@@ -120,10 +122,11 @@ export default function Navbar() {
           className={cn(isHome ? activeNavClass : inactiveNavClass)}
         >
           Home
-        </a>
+        </LineHoverLink>
 
-        <a
+        <LineHoverLink
           href="/projects"
+          variant="slide"
           onClick={(e) => {
             e.preventDefault();
             router.push("/projects");
@@ -131,7 +134,7 @@ export default function Navbar() {
           className={cn(isProjects ? activeNavClass : inactiveNavClass)}
         >
           Projects
-        </a>
+        </LineHoverLink>
 
         <div className="relative" ref={dropdownRef}>
           <button

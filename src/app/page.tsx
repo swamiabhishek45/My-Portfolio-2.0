@@ -7,6 +7,7 @@ import Technologies from "@/sections/technologies";
 import ParticleTypographyDense from "@/sections/particle-typography";
 import { DottedGridSection } from "@/components/ui/dotted-grid";
 import Navbar from "@/components/navbar";
+import { SectionHeading } from "@/components/section-heading";
 import { getProjects } from "@/lib/projects";
 
 export default function Page() {
@@ -24,25 +25,19 @@ export default function Page() {
 
           {/* Overview Block */}
           <DottedGridSection id="overview" className="py-2 px-3 sm:px-4 flex items-center">
-            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 font-sans">
-              Overview
-            </h2>
+            <SectionHeading>Overview</SectionHeading>
           </DottedGridSection>
           <DottedGridSection><Overview /></DottedGridSection>
 
           {/* Skills Block */}
           <DottedGridSection id="technologies" className="py-2 px-3 sm:px-4 flex items-center">
-            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 font-sans">
-              Skills
-            </h2>
+            <SectionHeading>Skills</SectionHeading>
           </DottedGridSection>
           <DottedGridSection><Technologies /></DottedGridSection>
 
           {/* Projects Block */}
           <DottedGridSection id="projects" className="py-2 px-3 sm:px-4 flex items-center">
-            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 font-sans">
-              Projects
-            </h2>
+            <SectionHeading>Projects</SectionHeading>
           </DottedGridSection>
           <DottedGridSection className="px-2 sm:px-3">
             <Projects projects={projects} limit={2} />
@@ -55,9 +50,7 @@ export default function Page() {
 
           {/* Contact Block */}
           <DottedGridSection id="contact" className="py-2 px-3 sm:px-4 flex items-center">
-            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 font-sans">
-              Contact
-            </h2>
+            <SectionHeading>Contact</SectionHeading>
           </DottedGridSection>
           <DottedGridSection><Contact /></DottedGridSection>
 

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { IoIosArrowBack } from "react-icons/io";
 import { DottedGridSection } from "@/components/ui/dotted-grid";
 import Navbar from "@/components/navbar";
+import { SectionHeading } from "@/components/section-heading";
 import { ProjectCard } from "@/components/project-card";
 
 export default function ProjectsPageClient({
@@ -34,9 +35,9 @@ export default function ProjectsPageClient({
               >
                 <IoIosArrowBack className="text-lg" />
               </button>
-              <h1 className="text-xl font-bold tracking-tight text-neutral-900 sm:text-2xl dark:text-neutral-50">
+              <SectionHeading className="text-xl sm:text-2xl">
                 Projects
-              </h1>
+              </SectionHeading>
             </div>
             <span className="font-mono text-xs text-neutral-500">
               {projects.length} projects listed

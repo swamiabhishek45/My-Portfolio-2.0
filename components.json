@@ -23,6 +23,7 @@
     "@magicui": "https://magicui.design/r/{name}.json",
     "@ncdai": "https://chanhdai.com/r/{name}.json",
     "@lucide-animated": "https://lucide-animated.com/r/{name}.json",
-    "@componentry": "https://componentry.fun/r/{name}.json"
+    "@componentry": "https://componentry.fun/r/{name}.json",
+    "@vengeanceui": "https://raw.githubusercontent.com/Ashutoshx7/VengeanceUI/main/public/r/{name}.json"
   }
 }

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { IoIosArrowBack } from "react-icons/io";
-import { Calendar, ArrowUpRight } from "lucide-react";
 import { DottedGridSection } from "@/components/ui/dotted-grid";
+import { BlogPostsList } from "@/components/blog-posts-list";
+import { SectionHeading } from "@/components/section-heading";
 import Navbar from "@/components/navbar";
 import { getCachedMediumPosts } from "@/lib/medium";
 
@@ -33,9 +34,7 @@ export default async function BlogPage() {
               >
                 <IoIosArrowBack className="text-lg" />
               </Link>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
-                Blogs
-              </h1>
+              <SectionHeading className="text-xl sm:text-2xl">Blogs</SectionHeading>
             </div>
             <span className="text-xs font-mono text-neutral-500">
               {posts.length} {posts.length === 1 ? "article" : "articles"}
@@ -51,46 +50,14 @@ export default async function BlogPage() {
                 No articles found. Check back soon!
               </p>
             ) : (
-              posts.map((post) => (
-                <a
-                  key={post.url}
-                  href={post.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="border border-dotted border-neutral-300 dark:border-neutral-800/80 rounded-2xl p-5 bg-neutral-50/20 dark:bg-neutral-900/20 hover:border-neutral-400 dark:hover:border-neutral-700 transition-all flex flex-col gap-3 group"
-                >
-                  <div className="flex items-center justify-between text-xs font-mono text-neutral-500">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {post.date}
-                    </span>
-                    <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                  </div>
-
-                  <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 group-hover:text-blue-500 transition-colors">
-                    {post.title}
-                  </h2>
-
-                  {post.excerpt ? (
-                    <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed line-clamp-3">
-                      {post.excerpt}
-                    </p>
-                  ) : null}
-
-                  {post.tags.length > 0 ? (
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      {post.tags.slice(0, 4).map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2 py-0.5 text-[10px] font-mono rounded bg-neutral-100 dark:bg-neutral-800 border border-dotted border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </a>
-              ))
+              <BlogPostsList
+                posts={posts.map((post) => ({
+                  url: post.url,
+                  title: post.title,
+                  date: post.date,
+                  excerpt: post.excerpt,
+                }))}
+              />
             )}
           </DottedGridSection>
         </div>

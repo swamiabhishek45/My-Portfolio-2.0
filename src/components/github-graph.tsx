@@ -11,6 +11,9 @@ import {
   type ContributionWeek,
 } from "@/lib/github-contribution-calendar";
 import type { ContributionYear } from "@/lib/github-contributions";
+import { GithubButton } from "@/components/ui/github-button";
+import StatsCounter from "@/components/ui/stats-counter";
+import TextAnimation from "@/components/ui/staggerText";
 import { cn } from "@/lib/utils";
 
 const CONTRIBUTIONS_CACHE_TTL_MS = 60 * 60 * 1000;
@@ -249,17 +252,25 @@ export function GithubGraph() {
             id="github-activity-title"
             className="text-[18px] font-bold tracking-tight text-zinc-900 dark:text-zinc-100"
           >
-            GitHub Activity
+            <TextAnimation divideBy="word">GitHub Activity</TextAnimation>
           </h2>
 
           <p
             className="text-center text-[11px] text-zinc-500 dark:text-zinc-400"
             aria-live="polite"
           >
-            {graphStatus}
+            {loading && totalContributions === 0 ? (
+              "Loading GitHub contribution activity"
+            ) : (
+              <>
+                <StatsCounter value={totalContributions} decimals={0} />{" "}
+                GitHub activities in {selectedYear}
+              </>
+            )}
           </p>
 
-          <div className="relative flex justify-end" ref={yearMenuRef}>
+          <div className="relative flex items-center justify-end gap-2" ref={yearMenuRef}>
+            <GithubButton />
             <button
               type="button"
               aria-haspopup="listbox"

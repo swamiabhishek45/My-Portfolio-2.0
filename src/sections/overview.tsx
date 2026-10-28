@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, type CSSProperties } from "react";
 import { Lightbulb, User, Globe } from "lucide-react";
 import { overviewData } from "@/data/overview";
 import SocialLinks from "@/components/social-links";
+import { LineHoverLink } from "@/components/ui/line-hover-link";
 import { MapPinIcon } from "@/components/ui/map-pin";
 import { AtSignIcon } from "@/components/ui/at-sign";
 import { LinkIcon } from "@/components/ui/link";
@@ -173,16 +174,17 @@ export default function Overview() {
 
           <div className="overview-web flex min-h-9 items-center gap-3">
             <OverviewIcon icon={LinkIcon} iconRef={linkRef} />
-            <a
+            <LineHoverLink
               href={overviewData.websiteRaw}
               target="_blank"
               rel="noopener noreferrer"
+              variant="double"
               onMouseEnter={() => linkRef.current?.startAnimation()}
               onMouseLeave={() => linkRef.current?.stopAnimation()}
-              className="text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white font-medium text-sm sm:text-base transition-colors"
+              className="text-sm font-medium text-neutral-800 sm:text-base dark:text-neutral-200"
             >
               {overviewData.website}
-            </a>
+            </LineHoverLink>
           </div>
 
           <div
@@ -205,7 +207,7 @@ export default function Overview() {
               href={`mailto:${overviewData.email}`}
               onMouseEnter={() => emailRef.current?.startAnimation()}
               onMouseLeave={() => emailRef.current?.stopAnimation()}
-              className="break-all text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white font-medium text-sm sm:text-base transition-colors"
+              className="break-all text-sm font-medium text-neutral-800 transition-colors hover:text-neutral-950 sm:text-base dark:text-neutral-200 dark:hover:text-white"
             >
               {overviewData.email}
             </a>
