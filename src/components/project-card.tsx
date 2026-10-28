@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 import type { Project } from "@/lib/projects";
 import { cn } from "@/lib/utils";
@@ -60,10 +61,18 @@ export function ProjectCard({
   return (
     <article
       className={cn(
-        "group flex flex-col gap-2 rounded-xl border border-dotted border-neutral-300/80 bg-neutral-50/5 p-2 dark:border-neutral-800/80 dark:bg-neutral-950/20",
+        "group relative flex cursor-pointer flex-col gap-2 rounded-xl border border-dotted border-neutral-300/80 bg-neutral-50/5 p-2 transition-colors hover:border-neutral-400 dark:border-neutral-800/80 dark:bg-neutral-950/20 dark:hover:border-neutral-600",
         className
       )}
     >
+      <Link
+        href={`/projects/${project.slug}`}
+        className="absolute inset-0 z-0 rounded-xl"
+        aria-label={`View ${project.name} details`}
+      />
+      <div
+        className="relative z-[1] pointer-events-none"
+      >
       <div
         className={cn(
           "relative overflow-hidden rounded-lg p-2",
@@ -124,7 +133,7 @@ export function ProjectCard({
             ))}
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="pointer-events-auto flex items-center gap-1">
             <ProjectLinkIcon href={project.live} label={`${project.name} live site`}>
               <span
                 className="flex items-center justify-center"
@@ -151,6 +160,7 @@ export function ProjectCard({
             </ProjectLinkIcon>
           </div>
         </div>
+      </div>
       </div>
     </article>
   );

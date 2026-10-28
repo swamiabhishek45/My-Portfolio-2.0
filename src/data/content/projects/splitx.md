@@ -13,6 +13,7 @@ tech:
   - TypeScript
   - Tailwind CSS
 excerpt: Have one panoramic or wide image? SplitX cuts it into 2–4 matching pieces so you can post them as a swipeable slideshow on X (Twitter).
+problemStatement: Posting a wide photo as a swipeable thread on X means manually cropping the same image several times; edges rarely line up, which looks sloppy and wastes time.
 ---
 
 SplitX is for people who want a clean carousel post without manual cropping in an editor. Upload one wide picture, pick how many slides you want, and download images that line up edge-to-edge when viewers swipe—handy for infographics, event photos, or before-and-after shots.

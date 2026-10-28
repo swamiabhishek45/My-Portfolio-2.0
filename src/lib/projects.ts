@@ -17,6 +17,7 @@ export interface Project {
   live: string;
   shortDescription: string;
   detailedDescription: string;
+  problemStatement: string;
   tech: string[];
   category: string;
   badge?: string;
@@ -35,6 +36,7 @@ type Frontmatter = {
   order?: number;
   tech?: string[];
   excerpt?: string;
+  problemStatement?: string;
   badge?: string;
   tagline?: string;
   gradient?: string;
@@ -104,6 +106,7 @@ function parseProjectFile(filePath: string): Project {
     github: data.github ?? "",
     shortDescription: data.excerpt ?? content.split("\n\n")[0] ?? "",
     detailedDescription: content || data.excerpt || "",
+    problemStatement: data.problemStatement ?? "",
     tech: data.tech ?? [],
     category: data.category ?? "",
     badge: data.badge,
@@ -121,4 +124,12 @@ export function getProjects(): Project[] {
     .filter((file) => file.endsWith(".md"))
     .map((file) => parseProjectFile(path.join(PROJECTS_DIR, file)))
     .sort((a, b) => a.order - b.order);
+}
+
+export function getProjectBySlug(slug: string): Project | undefined {
+  return getProjects().find((project) => project.slug === slug);
+}
+
+export function getProjectSlugs(): string[] {
+  return getProjects().map((project) => project.slug);
 }
