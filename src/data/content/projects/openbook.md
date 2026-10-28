@@ -6,7 +6,7 @@ live: https://openbook.swamiabhishek45.online/
 github: https://github.com/swamiabhishek45/OpenBook
 category: GenAI
 order: 1
-tagline: AI-powered research workspace
+tagline: Ask questions about your own files
 gradient: lime
 tech:
   - Next.js
@@ -23,7 +23,7 @@ tech:
   - Pinecone
   - Mem0
   - ElevenLabs
-excerpt: OpenBook is an AI-powered research workspace that connects to your PDFs, articles, and videos to deliver precise, citation-grounded answers without hallucinations.
+excerpt: Upload PDFs, articles, or videos and ask questions in plain English. OpenBook answers using your sources and shows where each answer came from, so you can double-check it.
 ---
 
-OpenBook is an AI-powered research workspace that connects to your PDFs, articles, and videos to deliver precise, citation-grounded answers without hallucinations. It automatically transforms your library into interactive flashcards, quizzes, mind maps, and two-host debate podcasts you can interrupt in real time.
+OpenBook is a study and research helper. You add your own PDFs, articles, and videos, then chat with them like a patient tutor. Answers point back to the exact place in your material, so you are not guessing whether something is made up. It can also turn what you uploaded into flashcards, quizzes, mind maps, and podcast-style conversations between two voices that you can jump into anytime.

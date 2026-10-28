@@ -6,7 +6,7 @@ live: https://pollution-pulse.vercel.app/
 github: https://github.com/swamiabhishek45/pollution-pulse2
 category: Full Stack
 order: 3
-tagline: Healthiest route planning with AI
+tagline: Pick a route with cleaner air
 gradient: sky
 tech:
   - Next.js
@@ -15,7 +15,7 @@ tech:
   - Gemini API
   - LangChain
   - AI Agent
-excerpt: An AI-powered route planning application that finds the healthiest path to your destination by analyzing real-time air quality data across multiple routes.
+excerpt: Plan a trip across town and see which walking, biking, or driving route likely has the least polluted air, using live air-quality maps.
 ---
 
-Pollution Pulse is an intelligent route planning application designed to help users navigate their cities while minimizing exposure to air pollution. Leveraging real-time air quality data and advanced AI routing algorithms, the platform recommends the healthiest paths for walking, cycling, and driving.
+Pollution Pulse helps you get from A to B while breathing a little easier. You enter where you are going, and it compares several routes using up-to-date air pollution readings. It then suggests the option that keeps you away from the worst smog when you walk, cycle, or drive—especially useful on hazy days in busy cities.

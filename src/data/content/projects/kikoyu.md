@@ -6,7 +6,7 @@ live: https://kikoyu.swamiabhishek45.online/
 github: https://github.com/swamiabhishek45/Kikoyu-Agent-SDK
 category: Agent SDK
 order: 2
-tagline: Type-safe AI agent workflows
+tagline: Reliable building blocks for smart assistants
 gradient: rose
 tech:
   - TypeScript
@@ -16,7 +16,7 @@ tech:
   - Agent SDK
   - LLM
   - npm
-excerpt: An Agent SDK for building AI agent workflows with type-safe tools, memory, execution loops, handoffs, guardrails, and streaming capabilities.
+excerpt: A toolkit for building apps that use smart assistants—so they remember context, stay within safe rules, and pass work between specialized helpers when needed.
 ---
 
-An Agent SDK for building AI agent workflows with type-safe tools, memory, execution loops, handoffs, guardrails, and streaming capabilities. Kikoyu ships a fluent AgentBuilder, concurrent guardrails, multi-agent handoffs, session memory, and async generator streaming for production TypeScript apps.
+Kikoyu is software other developers use to add capable assistants to their products. It helps an assistant remember earlier parts of a conversation, follow clear safety rules, and hand a task to another specialized assistant when that makes sense. The goal is assistants that feel steady and predictable in real apps, not one-off demos.
