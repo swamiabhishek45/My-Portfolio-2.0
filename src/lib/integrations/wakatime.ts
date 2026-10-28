@@ -8,6 +8,19 @@ export type WakaTimeStatus = {
   activeTimeToday: string | null;
 };
 
+type WakaTimeTotals = {
+  human_readable_total?: string;
+  human_readable_total_including_other_language?: string;
+  total_seconds?: number;
+  total_seconds_including_other_language?: number;
+  text?: string;
+  grand_total?: {
+    human_readable_total?: string;
+    total_seconds?: number;
+    text?: string;
+  };
+};
+
 function wakatimeAuthHeader(): string {
   const key = process.env.WAKATIME_API_KEY;
   if (!key) return "";
@@ -17,25 +30,63 @@ function wakatimeAuthHeader(): string {
 function getEditorName(pluginString: string): string {
   if (!pluginString) return "VS Code";
   const str = pluginString.toLowerCase();
+  if (str.includes("antigravity")) return "Antigravity";
   if (str.includes("cursor")) return "Cursor";
   if (str.includes("vscode") || str.includes("vs code")) return "VS Code";
   return "VS Code";
 }
 
-function formatActiveTimeToday(statsData: {
-  human_readable_total?: string;
-  total_seconds?: number;
-} | null): string | null {
+function formatActiveTimeToday(statsData: WakaTimeTotals | null): string | null {
   if (!statsData) return null;
-  if (statsData.human_readable_total) return statsData.human_readable_total;
-  const seconds = statsData.total_seconds ?? 0;
+
+  const gt = statsData.grand_total;
+  const human =
+    statsData.human_readable_total_including_other_language ??
+    statsData.human_readable_total ??
+    statsData.text ??
+    gt?.human_readable_total ??
+    gt?.text;
+
+  if (human?.trim()) return human.trim();
+
+  const seconds =
+    statsData.total_seconds_including_other_language ??
+    statsData.total_seconds ??
+    gt?.total_seconds ??
+    0;
+
   if (seconds <= 0) return "0 mins";
+
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   if (hours > 0) {
     return minutes > 0 ? `${hours} hrs ${minutes} mins` : `${hours} hrs`;
   }
   return `${minutes} mins`;
+}
+
+async function fetchTodayActiveTime(auth: string): Promise<string | null> {
+  const urls = [
+    "https://wakatime.com/api/v1/users/current/status_bar/today",
+    "https://wakatime.com/api/v1/users/current/stats/today",
+  ];
+
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, {
+        headers: { Authorization: auth },
+        cache: "no-store",
+      });
+      if (!res.ok) continue;
+      const json = (await res.json()) as { data?: WakaTimeTotals };
+      const formatted = formatActiveTimeToday(json.data ?? null);
+      if (formatted) return formatted;
+    } catch {
+      /* try next endpoint */
+    }
+  }
+
+  return null;
 }
 
 export async function getWakaTimeToday(): Promise<WakaTimeStatus> {
@@ -53,27 +104,18 @@ export async function getWakaTimeToday(): Promise<WakaTimeStatus> {
 
   try {
     const auth = wakatimeAuthHeader();
-    const [userRes, statsTodayRes] = await Promise.all([
+    const [userRes, activeTimeToday] = await Promise.all([
       fetch("https://wakatime.com/api/v1/users/current", {
         headers: { Authorization: auth },
         cache: "no-store",
       }),
-      fetch("https://wakatime.com/api/v1/users/current/stats/today", {
-        headers: { Authorization: auth },
-        cache: "no-store",
-      }),
+      fetchTodayActiveTime(auth),
     ]);
 
     if (!userRes.ok) throw new Error("WakaTime user API error");
     const userData = await userRes.json();
     const data = userData.data;
     if (!data) throw new Error("No WakaTime user data");
-
-    let activeTimeToday: string | null = null;
-    if (statsTodayRes.ok) {
-      const statsTodayData = await statsTodayRes.json();
-      activeTimeToday = formatActiveTimeToday(statsTodayData?.data ?? null);
-    }
 
     const lastHeartbeatAt = data.last_heartbeat_at as string | undefined;
     if (!lastHeartbeatAt) {

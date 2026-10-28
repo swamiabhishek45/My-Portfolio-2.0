@@ -172,7 +172,7 @@ export default function Header() {
           {/* Avatar with Liquid Surface Effect */}
             <ScannerAvatar
               primaryImage="/avatar.png"
-              secondaryImage="/photo.png"
+              secondaryImage="/avatar.jpg"
               interval={3000}
               duration={650}
               className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl sm:rounded-[18px]"
