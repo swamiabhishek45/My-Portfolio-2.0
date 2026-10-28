@@ -7,6 +7,26 @@ import { formatActiveSeconds } from "@/lib/format-active-time";
 import type { WakaTimeStatus } from "@/lib/integrations/wakatime";
 
 const WAKATIME_KEY = "/api/wakatime";
+const WAKATIME_CACHE_KEY = "portfolio:wakatime-status";
+
+function readCachedStatus(): WakaTimeStatus | undefined {
+  if (typeof window === "undefined") return undefined;
+  try {
+    const raw = sessionStorage.getItem(WAKATIME_CACHE_KEY);
+    if (!raw) return undefined;
+    return JSON.parse(raw) as WakaTimeStatus;
+  } catch {
+    return undefined;
+  }
+}
+
+function writeCachedStatus(status: WakaTimeStatus) {
+  try {
+    sessionStorage.setItem(WAKATIME_CACHE_KEY, JSON.stringify(status));
+  } catch {
+    /* ignore quota */
+  }
+}
 
 async function fetchWakaTime(url: string): Promise<WakaTimeStatus> {
   const res = await fetch(url, {
@@ -14,12 +34,22 @@ async function fetchWakaTime(url: string): Promise<WakaTimeStatus> {
     headers: { "Cache-Control": "no-cache" },
   });
   if (!res.ok) throw new Error("Failed to fetch WakaTime status");
-  return res.json() as Promise<WakaTimeStatus>;
+  const data = (await res.json()) as WakaTimeStatus;
+  writeCachedStatus(data);
+  return data;
 }
 
 /** Polls WakaTime while the tab is visible. */
 export function useWakaTimeStatus() {
-  return useSWR<WakaTimeStatus>(WAKATIME_KEY, fetchWakaTime, {
+  const [cachedStatus, setCachedStatus] = useState<WakaTimeStatus | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    setCachedStatus(readCachedStatus());
+  }, []);
+
+  const swr = useSWR<WakaTimeStatus>(WAKATIME_KEY, fetchWakaTime, {
     refreshInterval: (latest) =>
       latest?.status === "coding" ? 20_000 : 30_000,
     refreshWhenHidden: false,
@@ -29,6 +59,14 @@ export function useWakaTimeStatus() {
     dedupingInterval: 5_000,
     keepPreviousData: true,
   });
+
+  useEffect(() => {
+    if (swr.data) writeCachedStatus(swr.data);
+  }, [swr.data]);
+
+  const data = swr.data ?? cachedStatus;
+
+  return { ...swr, data };
 }
 
 /**

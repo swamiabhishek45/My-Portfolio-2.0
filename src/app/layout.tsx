@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { GeistPixelGrid, GeistPixelSquare } from "geist/font/pixel";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AgentFab } from "@/components/agent/agent-fab";
+import { ThemeInitScript } from "@/components/theme-init-script";
 import { WalkingAvatar } from "@/components/walking-avatar";
 
 export const metadata: Metadata = {
@@ -31,6 +32,7 @@ export default function RootLayout({
         className={`${GeistPixelSquare.variable} ${GeistPixelGrid.variable}`}
       >
         <head>
+          <ThemeInitScript />
           <title>Abhishek Swami</title>
           <link rel="icon" href="/favicon.png" type="image/png" sizes="any" />
           <link rel="apple-touch-icon" href="/favicon.png" />

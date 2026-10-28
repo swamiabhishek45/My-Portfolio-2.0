@@ -139,13 +139,6 @@ export default function DeveloperStatus() {
           Editor: {data.editor}
         </div>
 
-        {data.project && (
-          <div className="truncate text-xs text-neutral-600 dark:text-neutral-400 flex items-center gap-1">
-            <span className="font-medium text-neutral-400 dark:text-neutral-500">Project:</span>
-            <span>{data.project}</span>
-          </div>
-        )}
-
         {data.language && (
           <div className="truncate text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1 mt-0.5">
             <span className="font-medium text-neutral-400 dark:text-neutral-500">Language:</span>

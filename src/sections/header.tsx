@@ -19,36 +19,21 @@ export default function Header() {
   const [visitorCount, setVisitorCount] = useState<number | null>(null);
   const [wordIndex, setWordIndex] = useState(0);
   const [currentTime, setCurrentTime] = useState("");
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    const updateTheme = () => {
-      setIsDark(document.documentElement.classList.contains("dark"));
-    };
-
-    updateTheme();
-
-    const observer = new MutationObserver(updateTheme);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    return () => observer.disconnect();
-  }, []);
 
   const ref = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isInView = useInView(ref);
   const play = isInView;
 
-  const { data: statusData } = useWakaTimeStatus();
+  const { data: statusData, isLoading: wakaLoading } = useWakaTimeStatus();
   const liveActiveToday = useLiveActiveTimeToday(statusData);
 
   const isCoding = statusData?.status === "coding";
-  const editor = statusData?.editor || "Antigravity";
-  const isCooking = statusData?.configured ? isCoding : !statusData;
-  const EditorIcon = getEditorIcon(editor);
+  const editor = statusData?.editor ?? null;
+  const isCooking = statusData?.configured === true && isCoding;
+  const EditorIcon = editor ? getEditorIcon(editor) : null;
+  const showStatusLoading =
+    wakaLoading && statusData?.configured !== true;
 
   const activeTimeText =
     statusData?.configured && liveActiveToday
@@ -150,13 +135,24 @@ export default function Header() {
       {/* Top Panoramic Hero Banner */}
       <div className="relative w-full h-40 sm:h-48 overflow-hidden border-b border-dotted border-neutral-300 dark:border-neutral-800/80 group">
         <Image
-          src={isDark ? "/night-banner.png" : "/day-banner.png"}
-          alt={isDark ? "Night banner" : "Day banner"}
+          src="/day-banner.png"
+          alt=""
+          aria-hidden
           fill
           priority
           sizes="(max-width: 640px) 100vw, 672px"
           quality={75}
-          className="object-cover object-center brightness-95 filter transition-transform duration-700 group-hover:scale-105 dark:brightness-90"
+          className="object-cover object-center brightness-95 filter transition-transform duration-700 group-hover:scale-105 dark:hidden"
+        />
+        <Image
+          src="/night-banner.png"
+          alt=""
+          aria-hidden
+          fill
+          priority
+          sizes="(max-width: 640px) 100vw, 672px"
+          quality={75}
+          className="hidden object-cover object-center brightness-90 filter transition-transform duration-700 group-hover:scale-105 dark:block"
         />
         <canvas
           ref={canvasRef}
@@ -231,20 +227,23 @@ export default function Header() {
             {/* Wakatime / Activity Status Bar */}
             <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-neutral-700 dark:text-neutral-400 min-h-4 font-mono font-medium truncate">
               <span className="relative flex h-2 w-2 shrink-0">
-                {(!statusData || isCoding) && (
+                {isCooking && (
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 )}
                 <span
-                  className={`relative inline-flex rounded-full h-2 w-2 ${statusData
-                    ? isCoding
+                  className={`relative inline-flex rounded-full h-2 w-2 ${
+                    isCooking
                       ? "bg-green-500"
-                      : "bg-neutral-400 dark:bg-neutral-600"
-                    : "bg-green-500"
-                    }`}
+                      : showStatusLoading
+                        ? "bg-neutral-300 dark:bg-neutral-600 animate-pulse"
+                        : "bg-neutral-400 dark:bg-neutral-600"
+                  }`}
                 ></span>
               </span>
               <span className="flex min-w-0 items-center gap-1 truncate">
-                {isCooking ? (
+                {showStatusLoading ? (
+                  <span className="text-neutral-500">Syncing activity…</span>
+                ) : isCooking ? (
                   <>
                     <span className="shrink-0">Cooking in</span>
                     {EditorIcon ? (
@@ -253,7 +252,21 @@ export default function Header() {
                         aria-hidden
                       />
                     ) : null}
-                    <span className="truncate">{editor}</span>
+                    <span className="truncate">{editor ?? "your IDE"}</span>
+                    {activeTimeText}
+                  </>
+                ) : editor ? (
+                  <>
+                    <span className="shrink-0">Last active in</span>
+                    {EditorIcon ? (
+                      <EditorIcon
+                        className="h-3.5 w-3.5 shrink-0 text-neutral-800 dark:text-neutral-200"
+                        aria-hidden
+                      />
+                    ) : null}
+                    <span className="truncate font-medium text-neutral-800 dark:text-neutral-200">
+                      {editor}
+                    </span>
                     {activeTimeText}
                   </>
                 ) : (
