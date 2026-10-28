@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { IoIosArrowBack } from "react-icons/io";
+import { Calendar, ArrowUpRight } from "lucide-react";
 import { DottedGridSection } from "@/components/ui/dotted-grid";
-import { BlogPostsList } from "@/components/blog-posts-list";
 import { SectionHeading } from "@/components/section-heading";
 import Navbar from "@/components/navbar";
 import { getCachedMediumPosts } from "@/lib/medium";
@@ -50,14 +50,46 @@ export default async function BlogPage() {
                 No articles found. Check back soon!
               </p>
             ) : (
-              <BlogPostsList
-                posts={posts.map((post) => ({
-                  url: post.url,
-                  title: post.title,
-                  date: post.date,
-                  excerpt: post.excerpt,
-                }))}
-              />
+              posts.map((post) => (
+                <a
+                  key={post.url}
+                  href={post.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex flex-col gap-3 rounded-2xl border border-dotted border-neutral-300 bg-neutral-50/20 p-5 transition-all hover:border-neutral-400 dark:border-neutral-800/80 dark:bg-neutral-900/20 dark:hover:border-neutral-700"
+                >
+                  <div className="flex items-center justify-between text-xs font-mono text-neutral-500">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="h-3.5 w-3.5" />
+                      {post.date}
+                    </span>
+                    <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </div>
+
+                  <h2 className="text-lg font-bold text-neutral-900 transition-colors group-hover:text-blue-500 dark:text-neutral-100">
+                    {post.title}
+                  </h2>
+
+                  {post.excerpt ? (
+                    <p className="line-clamp-3 text-xs leading-relaxed text-neutral-700 sm:text-sm dark:text-neutral-300">
+                      {post.excerpt}
+                    </p>
+                  ) : null}
+
+                  {post.tags.length > 0 ? (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {post.tags.slice(0, 4).map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded border border-dotted border-neutral-300 bg-neutral-100 px-2 py-0.5 font-mono text-[10px] text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </a>
+              ))
             )}
           </DottedGridSection>
         </div>
