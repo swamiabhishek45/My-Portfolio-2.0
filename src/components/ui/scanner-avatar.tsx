@@ -51,15 +51,13 @@ export default function ScannerAvatar({
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const shakeControls = useAnimation();
 
-  // Preload images
   useEffect(() => {
-    const img1 = new Image();
-    img1.crossOrigin = "anonymous";
+    const img1 = new window.Image();
     img1.src = primaryImage;
+    img1.decode?.().catch(() => undefined);
     primaryImgRef.current = img1;
 
-    const img2 = new Image();
-    img2.crossOrigin = "anonymous";
+    const img2 = new window.Image();
     img2.src = secondaryImage;
     secondaryImgRef.current = img2;
   }, [primaryImage, secondaryImage]);
@@ -323,7 +321,8 @@ export default function ScannerAvatar({
       {/* Base image (visible when not transitioning) */}
       <img
         src={showPrimary ? primaryImage : secondaryImage}
-        alt="Avatar"
+        alt="Abhishek Swami"
+        decoding="async"
         className="absolute inset-0 w-full h-full object-cover"
         style={{
           opacity: isTransitioning ? 0 : 1,

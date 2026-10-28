@@ -34,6 +34,7 @@ export default function RootLayout({
           <title>Abhishek Swami</title>
           <link rel="icon" href="/favicon.png" type="image/png" sizes="any" />
           <link rel="apple-touch-icon" href="/favicon.png" />
+          <link rel="preload" as="image" href="/avatar.jpg" fetchPriority="high" />
         </head>
         <body>
           <ThemeProvider

@@ -1,3 +1,5 @@
+import { formatActiveSeconds } from "@/lib/format-active-time";
+
 export type WakaTimeStatus = {
   configured: boolean;
   status: "coding" | "idle";
@@ -6,6 +8,10 @@ export type WakaTimeStatus = {
   language: string | null;
   lastActive: string | null;
   activeTimeToday: string | null;
+  /** Raw seconds from WakaTime (for live UI extrapolation while coding). */
+  activeSecondsToday: number | null;
+  /** Server ms timestamp when this payload was built. */
+  polledAt: number;
 };
 
 type WakaTimeTotals = {
@@ -36,9 +42,19 @@ function getEditorName(pluginString: string): string {
   return "VS Code";
 }
 
-function formatActiveTimeToday(statsData: WakaTimeTotals | null): string | null {
-  if (!statsData) return null;
+function extractSeconds(statsData: WakaTimeTotals | null): number {
+  if (!statsData) return 0;
+  const gt = statsData.grand_total;
+  return (
+    statsData.total_seconds_including_other_language ??
+    statsData.total_seconds ??
+    gt?.total_seconds ??
+    0
+  );
+}
 
+function extractHuman(statsData: WakaTimeTotals | null): string | null {
+  if (!statsData) return null;
   const gt = statsData.grand_total;
   const human =
     statsData.human_readable_total_including_other_language ??
@@ -46,50 +62,57 @@ function formatActiveTimeToday(statsData: WakaTimeTotals | null): string | null 
     statsData.text ??
     gt?.human_readable_total ??
     gt?.text;
-
-  if (human?.trim()) return human.trim();
-
-  const seconds =
-    statsData.total_seconds_including_other_language ??
-    statsData.total_seconds ??
-    gt?.total_seconds ??
-    0;
-
-  if (seconds <= 0) return "0 mins";
-
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  if (hours > 0) {
-    return minutes > 0 ? `${hours} hrs ${minutes} mins` : `${hours} hrs`;
-  }
-  return `${minutes} mins`;
+  return human?.trim() || null;
 }
 
-async function fetchTodayActiveTime(auth: string): Promise<string | null> {
+async function fetchTodayActiveTime(auth: string): Promise<{
+  text: string;
+  seconds: number;
+}> {
   const urls = [
     "https://wakatime.com/api/v1/users/current/status_bar/today",
     "https://wakatime.com/api/v1/users/current/stats/today",
   ];
 
-  for (const url of urls) {
-    try {
-      const res = await fetch(url, {
-        headers: { Authorization: auth },
-        cache: "no-store",
-      });
-      if (!res.ok) continue;
-      const json = (await res.json()) as { data?: WakaTimeTotals };
-      const formatted = formatActiveTimeToday(json.data ?? null);
-      if (formatted) return formatted;
-    } catch {
-      /* try next endpoint */
+  let bestSeconds = 0;
+  let bestHuman: string | null = null;
+
+  const results = await Promise.all(
+    urls.map(async (url) => {
+      try {
+        const res = await fetch(url, {
+          headers: { Authorization: auth },
+          cache: "no-store",
+        });
+        if (!res.ok) return null;
+        const json = (await res.json()) as { data?: WakaTimeTotals };
+        return json.data ?? null;
+      } catch {
+        return null;
+      }
+    })
+  );
+
+  for (const data of results) {
+    const seconds = extractSeconds(data);
+    const human = extractHuman(data);
+    if (seconds > bestSeconds) {
+      bestSeconds = seconds;
+      bestHuman = human;
+    } else if (!bestHuman && human) {
+      bestHuman = human;
     }
   }
 
-  return null;
+  const text =
+    bestHuman ?? formatActiveSeconds(bestSeconds) ?? "0 mins";
+
+  return { text, seconds: bestSeconds };
 }
 
 export async function getWakaTimeToday(): Promise<WakaTimeStatus> {
+  const polledAt = Date.now();
+
   if (!process.env.WAKATIME_API_KEY) {
     return {
       configured: false,
@@ -99,12 +122,14 @@ export async function getWakaTimeToday(): Promise<WakaTimeStatus> {
       language: null,
       lastActive: null,
       activeTimeToday: null,
+      activeSecondsToday: null,
+      polledAt,
     };
   }
 
   try {
     const auth = wakatimeAuthHeader();
-    const [userRes, activeTimeToday] = await Promise.all([
+    const [userRes, activeToday] = await Promise.all([
       fetch("https://wakatime.com/api/v1/users/current", {
         headers: { Authorization: auth },
         cache: "no-store",
@@ -118,6 +143,9 @@ export async function getWakaTimeToday(): Promise<WakaTimeStatus> {
     if (!data) throw new Error("No WakaTime user data");
 
     const lastHeartbeatAt = data.last_heartbeat_at as string | undefined;
+    const activeTimeToday =
+      activeToday.text || formatActiveSeconds(activeToday.seconds);
+
     if (!lastHeartbeatAt) {
       return {
         configured: true,
@@ -126,7 +154,9 @@ export async function getWakaTimeToday(): Promise<WakaTimeStatus> {
         project: null,
         language: null,
         lastActive: null,
-        activeTimeToday: activeTimeToday ?? "0 mins",
+        activeTimeToday,
+        activeSecondsToday: activeToday.seconds,
+        polledAt,
       };
     }
 
@@ -140,7 +170,9 @@ export async function getWakaTimeToday(): Promise<WakaTimeStatus> {
       project: data.last_project || null,
       language: data.last_language || null,
       lastActive: lastHeartbeatAt,
-      activeTimeToday: activeTimeToday ?? "0 mins",
+      activeTimeToday,
+      activeSecondsToday: activeToday.seconds,
+      polledAt,
     };
   } catch {
     return {
@@ -151,6 +183,8 @@ export async function getWakaTimeToday(): Promise<WakaTimeStatus> {
       language: null,
       lastActive: null,
       activeTimeToday: null,
+      activeSecondsToday: null,
+      polledAt,
     };
   }
 }

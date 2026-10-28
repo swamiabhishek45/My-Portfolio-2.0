@@ -1,43 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import useSWR from "swr";
 import { Terminal, AlertCircle, RefreshCw } from "lucide-react";
 
-interface WakaTimeStatus {
-  status: "coding" | "idle";
-  editor: string;
-  project: string | null;
-  language: string | null;
-  lastActive: string | null;
-  isMock?: boolean;
-}
-
-const fetcher = (url: string) => fetch(url).then((res) => {
-  if (!res.ok) throw new Error("Failed to fetch status");
-  return res.json();
-});
+import {
+  useLiveActiveTimeToday,
+  useWakaTimeStatus,
+} from "@/hooks/use-wakatime-status";
 
 export default function DeveloperStatus() {
-  const { data, error, isLoading, mutate } = useSWR<WakaTimeStatus>(
-    "/api/wakatime",
-    fetcher,
-    {
-      refreshInterval: 60000, // Refresh every 60 seconds
-      revalidateOnFocus: true,
-    }
-  );
+  const { data, error, isLoading, mutate } = useWakaTimeStatus();
+  const liveActiveToday = useLiveActiveTimeToday(data);
 
-  // Trigger local updates for the relative time counter (every 10s)
   const [timeTick, setTimeTick] = useState(0);
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeTick((t) => t + 1);
-    }, 10000);
+    }, 5000);
     return () => clearInterval(timer);
   }, []);
 
   function formatRelativeTime(dateString: string | null): string {
+    void timeTick;
     if (!dateString) return "No activity";
     const date = new Date(dateString);
     const now = new Date();
@@ -54,8 +38,7 @@ export default function DeveloperStatus() {
     return `${diffDay} day${diffDay === 1 ? "" : "s"} ago`;
   }
 
-  // Loading skeleton state
-  if (isLoading) {
+  if (isLoading && !data) {
     return (
       <div className="flex items-center gap-4 p-4 border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/40 rounded-xl animate-pulse max-w-md w-full">
         <div className="w-14 h-14 bg-neutral-200 dark:bg-neutral-800 rounded-xl shrink-0"></div>
@@ -68,8 +51,7 @@ export default function DeveloperStatus() {
     );
   }
 
-  // Error state
-  if (error || !data) {
+  if (error && !data) {
     return (
       <div className="flex items-center gap-4 p-4 border border-red-200 dark:border-red-950 bg-red-50/40 dark:bg-red-950/20 rounded-xl max-w-md w-full relative group">
         <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-red-100 dark:bg-red-950/50 border border-red-200 dark:border-red-900 text-red-500 shrink-0">
@@ -95,8 +77,7 @@ export default function DeveloperStatus() {
     );
   }
 
-  // Empty state when no heartbeat is found
-  if (!data.lastActive) {
+  if (!data?.lastActive && data?.configured) {
     return (
       <div className="flex items-center gap-4 p-4 border border-neutral-200 dark:border-neutral-800/80 bg-neutral-50/70 dark:bg-neutral-900/50 rounded-xl max-w-md w-full">
         <div className="w-14 h-14 shrink-0 flex items-center justify-center rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 text-neutral-400">
@@ -114,11 +95,14 @@ export default function DeveloperStatus() {
     );
   }
 
+  if (!data?.configured) {
+    return null;
+  }
+
   const isCoding = data.status === "coding";
 
   return (
     <div className="flex items-center gap-4 p-4 border border-neutral-200 dark:border-neutral-800/80 bg-neutral-50/70 dark:bg-neutral-900/50 hover:bg-neutral-100 dark:hover:bg-neutral-900/85 rounded-xl transition duration-300 group max-w-md w-full relative overflow-hidden">
-      {/* IDE/Editor Art Container */}
       <div className="relative w-14 h-14 shrink-0 flex items-center justify-center select-none">
         <div
           className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-md z-10 border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 transition-colors duration-300 ${
@@ -127,7 +111,6 @@ export default function DeveloperStatus() {
         >
           <Terminal className={`w-5 h-5 ${isCoding ? "text-green-500 animate-pulse" : "text-neutral-500"}`} />
         </div>
-        {/* Outline rotation effect mirroring Spotify vinyl */}
         <div
           className={`absolute inset-0 rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700 opacity-60 transition-colors duration-300 ${
             isCoding ? "animate-[spin_30s_linear_infinite] border-green-500/50" : ""
@@ -135,9 +118,7 @@ export default function DeveloperStatus() {
         ></div>
       </div>
 
-      {/* Details Section */}
       <div className="flex-1 min-w-0 flex flex-col justify-center">
-        {/* Status Line */}
         <div className="flex items-center gap-1.5 mb-1">
           <span className="relative flex h-2 w-2">
             {isCoding && (
@@ -154,12 +135,10 @@ export default function DeveloperStatus() {
           </span>
         </div>
 
-        {/* Editor Info */}
         <div className="truncate text-sm text-neutral-900 dark:text-neutral-100 group-hover:text-green-500 transition-colors duration-200">
-          {isCoding ? `Editor: ${data.editor}` : `Editor: ${data.editor}`}
+          Editor: {data.editor}
         </div>
 
-        {/* Project details */}
         {data.project && (
           <div className="truncate text-xs text-neutral-600 dark:text-neutral-400 flex items-center gap-1">
             <span className="font-medium text-neutral-400 dark:text-neutral-500">Project:</span>
@@ -167,7 +146,6 @@ export default function DeveloperStatus() {
           </div>
         )}
 
-        {/* Language details */}
         {data.language && (
           <div className="truncate text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1 mt-0.5">
             <span className="font-medium text-neutral-400 dark:text-neutral-500">Language:</span>
@@ -176,9 +154,14 @@ export default function DeveloperStatus() {
             </span>
           </div>
         )}
+
+        {liveActiveToday ? (
+          <div className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+            {liveActiveToday} active today
+          </div>
+        ) : null}
       </div>
 
-      {/* Visualizer Side */}
       <div className="flex flex-col items-end justify-between h-14 shrink-0 pb-1">
         <span className="text-[10px] text-neutral-400 dark:text-neutral-500 whitespace-nowrap self-end font-mono select-none">
           {formatRelativeTime(data.lastActive)}

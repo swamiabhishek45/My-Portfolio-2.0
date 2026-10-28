@@ -76,8 +76,10 @@ export function ProjectCard({
             alt={project.name}
             fill
             sizes="(max-width: 640px) 100vw, 320px"
+            quality={75}
             className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
-            priority={project.order <= 2}
+            priority={project.order <= 1}
+            loading={project.order <= 1 ? undefined : "lazy"}
           />
         </div>
       </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import type { Book } from "@/data/books";
 
@@ -12,7 +13,7 @@ export function BookCover({ book }: { book: Book }) {
 
   return (
     <div className="book3d-cover">
-      <div className="book3d-face book3d-face--front">
+      <div className="book3d-face book3d-face--front relative">
         {imageFailed ? (
           <div
             className="flex h-full w-full flex-col justify-between p-3 text-left"
@@ -31,15 +32,15 @@ export function BookCover({ book }: { book: Book }) {
             </span>
           </div>
         ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={book.cover}
             alt=""
-            aria-hidden="true"
+            aria-hidden
+            fill
+            sizes="120px"
+            quality={75}
             draggable={false}
-            loading="lazy"
-            decoding="async"
-            className="h-full w-full object-cover"
+            className="object-cover"
             onError={() => setImageFailed(true)}
           />
         )}

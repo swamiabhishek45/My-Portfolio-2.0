@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import useSWR from "swr";
+import Image from "next/image";
 import ScannerAvatar from "@/components/ui/scanner-avatar";
+import {
+  useLiveActiveTimeToday,
+  useWakaTimeStatus,
+} from "@/hooks/use-wakatime-status";
 import CountUp from "@/components/ui/count-up";
 import { Eye, BadgeCheck } from "lucide-react";
 import { motion, useInView } from "motion/react";
@@ -38,11 +42,8 @@ export default function Header() {
   const isInView = useInView(ref);
   const play = isInView;
 
-  const { data: statusData } = useSWR(
-    "/api/wakatime",
-    (url) => fetch(url).then((res) => res.json()),
-    { refreshInterval: 60000 }
-  );
+  const { data: statusData } = useWakaTimeStatus();
+  const liveActiveToday = useLiveActiveTimeToday(statusData);
 
   const isCoding = statusData?.status === "coding";
   const editor = statusData?.editor || "Antigravity";
@@ -50,8 +51,8 @@ export default function Header() {
   const EditorIcon = getEditorIcon(editor);
 
   const activeTimeText =
-    statusData?.configured && statusData.activeTimeToday
-      ? ` • ${statusData.activeTimeToday} active today`
+    statusData?.configured && liveActiveToday
+      ? ` • ${liveActiveToday} active today`
       : "";
 
   useEffect(() => {
@@ -148,10 +149,14 @@ export default function Header() {
     <section className="border border-dotted border-neutral-300 dark:border-neutral-800/80 rounded-2xl bg-neutral-50/20 dark:bg-neutral-900/20 relative overflow-hidden transition-all duration-300 flex flex-col">
       {/* Top Panoramic Hero Banner */}
       <div className="relative w-full h-40 sm:h-48 overflow-hidden border-b border-dotted border-neutral-300 dark:border-neutral-800/80 group">
-        <img
+        <Image
           src={isDark ? "/night-banner.png" : "/day-banner.png"}
-          alt={isDark ? "Night Banner" : "Day Banner"}
-          className="w-full h-full object-cover object-center filter brightness-95 dark:brightness-90 transition-transform duration-700 group-hover:scale-105"
+          alt={isDark ? "Night banner" : "Day banner"}
+          fill
+          priority
+          sizes="(max-width: 640px) 100vw, 672px"
+          quality={75}
+          className="object-cover object-center brightness-95 filter transition-transform duration-700 group-hover:scale-105 dark:brightness-90"
         />
         <canvas
           ref={canvasRef}
@@ -171,8 +176,8 @@ export default function Header() {
         <div className="flex flex-row items-center gap-3.5 sm:gap-5 text-left min-w-0">
           {/* Avatar with Liquid Surface Effect */}
             <ScannerAvatar
-              primaryImage="/avatar.png"
-              secondaryImage="/avatar.jpg"
+              primaryImage="/avatar.jpg"
+              secondaryImage="/avatar.png"
               interval={3000}
               duration={650}
               className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl sm:rounded-[18px]"
