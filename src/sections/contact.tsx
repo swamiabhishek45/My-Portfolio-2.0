@@ -26,7 +26,7 @@ export default function Contact() {
   return (
     <section className="flex w-full flex-col">
       <div className="flex flex-col gap-5 rounded-2xl border border-dotted border-neutral-300 bg-neutral-50/10 p-5 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between sm:p-6 dark:border-neutral-800/80 dark:bg-neutral-900/10">
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap justify-center gap-4 sm:justify-start">
           {socialLinks.map((item, index) => {
             const Icon = item.icon;
             return (
