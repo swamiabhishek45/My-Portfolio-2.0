@@ -1,6 +1,3 @@
-"use client";
-
-import TextAnimation from "@/components/ui/staggerText";
 import { cn } from "@/lib/utils";
 
 export function SectionHeading({
@@ -17,7 +14,7 @@ export function SectionHeading({
         className
       )}
     >
-      <TextAnimation divideBy="word">{children}</TextAnimation>
+      {children}
     </h2>
   );
 }

@@ -1,8 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { IoIosArrowBack } from "react-icons/io";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ChevronLeft } from "lucide-react";
 import { DottedGridSection } from "@/components/ui/dotted-grid";
 import Navbar from "@/components/navbar";
 import { readArticles } from "@/data/read";
@@ -28,7 +27,7 @@ export default function ReadPage() {
                 aria-label="Back to home"
                 className="p-1.5 rounded-lg border border-dotted border-neutral-300 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition cursor-pointer"
               >
-                <IoIosArrowBack className="text-lg" />
+                <ChevronLeft className="size-4" strokeWidth={1.5} aria-hidden />
               </button>
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
                 Read

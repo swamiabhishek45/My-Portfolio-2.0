@@ -40,7 +40,7 @@ export default function Contact() {
               >
                 <Icon />
                 <span
-                  className="pointer-events-none absolute left-1/2 -top-9 -translate-x-1/2 whitespace-nowrap rounded-md border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-black opacity-0 shadow-lg transition-all duration-150 group-hover:scale-100 group-hover:opacity-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
+                  className="pointer-events-none absolute left-1/2 -top-9 -translate-x-1/2 whitespace-nowrap rounded-md border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-black opacity-0 shadow-sm transition-opacity duration-150 group-hover:opacity-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
                 >
                   {item.name}
                 </span>
@@ -50,7 +50,7 @@ export default function Contact() {
         </div>
 
         <div className="max-w-xs text-center leading-snug">
-          <p className="text-sm italic text-neutral-700 dark:text-neutral-300">
+          <p className="text-sm text-neutral-700 dark:text-neutral-300">
             “{quote.text}”
           </p>
 
@@ -59,7 +59,7 @@ export default function Contact() {
               <LeftIcon />
             </span>
 
-            <span className="font-medium tracking-wide">{quote.author}</span>
+            <span className="font-medium">{quote.author}</span>
 
             <span className="text-sm opacity-80">
               <RightIcon />

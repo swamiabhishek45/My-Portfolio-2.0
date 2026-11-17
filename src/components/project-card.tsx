@@ -11,19 +11,10 @@ import {
   type ExternalLinkIconHandle,
 } from "@/components/ui/external-link";
 import { GithubIcon, type GithubIconHandle } from "@/components/ui/github";
-const DEFAULT_GRADIENT =
-  "bg-gradient-to-br from-neutral-200/30 via-neutral-100/10 to-neutral-950 dark:from-neutral-700/40 dark:via-neutral-900/20 dark:to-neutral-950";
-
-const GRADIENT_PRESETS: Record<string, string> = {
-  lime: "bg-gradient-to-br from-lime-300 via-emerald-200 to-green-400 dark:from-lime-500/50 dark:via-emerald-600/30 dark:to-green-800/40",
-  rose: "bg-gradient-to-br from-pink-300 via-rose-200 to-orange-300 dark:from-pink-500/50 dark:via-rose-600/30 dark:to-orange-700/40",
-  sky: "bg-gradient-to-br from-sky-300 via-cyan-200 to-blue-400 dark:from-sky-500/50 dark:via-cyan-600/30 dark:to-blue-800/40",
-};
-
-function resolveGradient(gradient?: string) {
-  if (!gradient) return DEFAULT_GRADIENT;
-  return GRADIENT_PRESETS[gradient] ?? gradient;
-}
+// One quiet mat from the neutral ramp. A small tone shift inside a single
+// neutral, so the screenshot is the only colour in the card.
+const SCREENSHOT_MAT =
+  "bg-gradient-to-b from-neutral-100 to-neutral-200/70 dark:from-neutral-900 dark:to-neutral-950";
 
 function ProjectLinkIcon({
   href,
@@ -61,13 +52,13 @@ export function ProjectCard({
   return (
     <article
       className={cn(
-        "group relative flex cursor-pointer flex-col gap-2 rounded-xl border border-dotted border-neutral-300/80 bg-neutral-50/5 p-2 transition-colors hover:border-neutral-400 dark:border-neutral-800/80 dark:bg-neutral-950/20 dark:hover:border-neutral-600",
+        "group relative flex cursor-pointer flex-col gap-2 rounded-2xl border border-dotted border-neutral-300/80 bg-neutral-50/5 p-2 transition-colors hover:border-neutral-400 dark:border-neutral-800/80 dark:bg-neutral-950/20 dark:hover:border-neutral-600",
         className
       )}
     >
       <Link
         href={`/projects/${project.slug}`}
-        className="absolute inset-0 z-0 rounded-xl"
+        className="absolute inset-0 z-0 rounded-2xl"
         aria-label={`View ${project.name} details`}
       />
       <div
@@ -76,10 +67,10 @@ export function ProjectCard({
       <div
         className={cn(
           "relative overflow-hidden rounded-lg p-2",
-          project.gradient ? resolveGradient(project.gradient) : DEFAULT_GRADIENT
+          SCREENSHOT_MAT
         )}
       >
-        <div className="relative aspect-[16/11] overflow-hidden rounded-md border border-white/20 bg-neutral-950 shadow-[0_12px_32px_-16px_rgba(0,0,0,0.75)]">
+        <div className="relative aspect-[16/11] overflow-hidden rounded-sm border border-black/10 bg-neutral-950 shadow-[0_8px_24px_-16px_rgba(0,0,0,0.5)] dark:border-white/10">
           <Image
             src={project.src}
             alt={project.name}
@@ -100,24 +91,21 @@ export function ProjectCard({
               {project.name}
             </h3>
             {tagline ? (
-              <p className="text-[10px] text-neutral-500 dark:text-neutral-400">
+              <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
                 {tagline}
               </p>
             ) : null}
           </div>
 
           <div className="flex shrink-0 items-center gap-1 pt-0.5">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            </span>
-            <span className="text-[10px] font-medium text-neutral-500 dark:text-neutral-400">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 dark:bg-emerald-500" aria-hidden />
+            <span className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400">
               Live
             </span>
           </div>
         </div>
 
-        <p className="line-clamp-4 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-400">
+        <p className="line-clamp-4 text-xs leading-relaxed text-neutral-600 dark:text-neutral-400">
           {project.detailedDescription || project.shortDescription}
         </p>
 
@@ -126,7 +114,7 @@ export function ProjectCard({
             {visibleTech.map((tech) => (
               <span
                 key={tech}
-                className="rounded border border-neutral-300 bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-300"
+                className="rounded border border-neutral-300 bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-300"
               >
                 {tech}
               </span>

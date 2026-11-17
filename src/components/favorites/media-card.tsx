@@ -18,36 +18,9 @@ type MediaCardProps = {
   onActivate?: () => void;
 };
 
-const CATEGORY_ACCENT: Record<
-  MediaCategoryKey,
-  { glow: string; ring: string; sheen: string }
-> = {
-  Movies: {
-    glow: "shadow-[0_12px_40px_-12px_rgba(251,191,36,0.55)]",
-    ring: "ring-amber-400/50",
-    sheen: "from-amber-500/25 via-transparent to-orange-600/10",
-  },
-  Series: {
-    glow: "shadow-[0_12px_40px_-12px_rgba(56,189,248,0.45)]",
-    ring: "ring-sky-400/45",
-    sheen: "from-sky-400/20 via-transparent to-cyan-500/10",
-  },
-  Anime: {
-    glow: "shadow-[0_12px_40px_-12px_rgba(192,132,252,0.5)]",
-    ring: "ring-violet-400/45",
-    sheen: "from-violet-500/25 via-transparent to-fuchsia-500/10",
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 18, scale: 0.96 },
-  show: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] as const },
-  },
-};
+// The poster is the colour. The card itself only lifts and sharpens its edge.
+const POSTER_RAISED =
+  "shadow-[0_12px_32px_-14px_rgba(0,0,0,0.65)] ring-black/20 dark:ring-white/25";
 
 export function MediaCard({
   item,
@@ -60,7 +33,6 @@ export function MediaCard({
 }: MediaCardProps) {
   const reduceMotion = useReducedMotion();
   const creditPrefix = creditLabel === "Director" ? "Dir." : "Creator";
-  const accent = CATEGORY_ACCENT[category];
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const showDetails = isActive || hovered || focused;
@@ -75,8 +47,6 @@ export function MediaCard({
 
   return (
     <motion.article
-      variants={itemVariants}
-      custom={index}
       className={cn(
         "favorites-poster-card group relative w-full cursor-pointer outline-none",
         isDimmed && "favorites-poster-card--dimmed",
@@ -100,30 +70,19 @@ export function MediaCard({
       whileHover={
         reduceMotion
           ? undefined
-          : { y: -10, scale: 1.05, transition: { duration: 0.28 } }
+          : { y: -4, transition: { duration: 0.2 } }
       }
-      whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+      whileTap={reduceMotion ? undefined : { scale: 0.99 }}
       transition={{ type: "spring", stiffness: 420, damping: 28 }}
     >
       <div
         className={cn(
           "relative aspect-2/3 w-full overflow-hidden rounded-[11px] bg-neutral-900 ring-1 ring-white/[0.08] transition-[box-shadow,ring-color] duration-300",
-          showDetails && accent.glow,
-          showDetails && `ring-2 ${accent.ring}`
+          showDetails && POSTER_RAISED
         )}
       >
-        <div
-          className={cn(
-            "pointer-events-none absolute -inset-1 z-10 rounded-[12px] bg-gradient-to-br opacity-0 transition-opacity duration-300",
-            accent.sheen,
-            showDetails && "opacity-100"
-          )}
-          aria-hidden
-        />
-
         <motion.div
           className="relative h-full w-full"
-          animate={reduceMotion ? undefined : { scale: showDetails ? 1.06 : 1 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
           <Image
@@ -144,7 +103,7 @@ export function MediaCard({
 
         <div
           className={cn(
-            "absolute inset-x-0 bottom-0 z-20 p-2 transition-all duration-300 sm:p-2.5",
+            "absolute inset-x-0 bottom-0 z-20 p-2 transition-[transform,opacity] duration-200 sm:p-2.5",
             showDetails
               ? "translate-y-0 opacity-100"
               : "pointer-events-none translate-y-2 opacity-0"

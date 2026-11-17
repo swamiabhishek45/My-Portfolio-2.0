@@ -12,8 +12,6 @@ import {
 } from "@/lib/github-contribution-calendar";
 import type { ContributionYear } from "@/lib/github-contributions";
 import { GithubButton } from "@/components/ui/github-button";
-import StatsCounter from "@/components/ui/stats-counter";
-import TextAnimation from "@/components/ui/staggerText";
 import { cn } from "@/lib/utils";
 
 const CONTRIBUTIONS_CACHE_TTL_MS = 60 * 60 * 1000;
@@ -230,8 +228,8 @@ export function GithubGraph() {
 
   const graphStatus =
     loading && totalContributions === 0
-      ? "Loading GitHub contribution activity"
-      : `${totalContributions.toLocaleString("en")} GitHub activities in ${selectedYear}`;
+      ? "Loading contributions"
+      : `${totalContributions.toLocaleString("en")} contributions in ${selectedYear}`;
 
   return (
     <section
@@ -252,7 +250,7 @@ export function GithubGraph() {
             id="github-activity-title"
             className="text-[18px] font-bold tracking-tight text-zinc-900 dark:text-zinc-100"
           >
-            <TextAnimation divideBy="word">GitHub Activity</TextAnimation>
+            GitHub Activity
           </h2>
 
           <p
@@ -260,11 +258,13 @@ export function GithubGraph() {
             aria-live="polite"
           >
             {loading && totalContributions === 0 ? (
-              "Loading GitHub contribution activity"
+              "Loading contributions"
             ) : (
               <>
-                <StatsCounter value={totalContributions} decimals={0} />{" "}
-                GitHub activities in {selectedYear}
+                <span className="tabular-nums">
+                  {totalContributions.toLocaleString("en")}
+                </span>{" "}
+                contributions in {selectedYear}
               </>
             )}
           </p>
@@ -397,7 +397,7 @@ export function GithubGraph() {
                           key={day.date}
                           tabIndex={0}
                           aria-label={`${day.contributionCount} contributions on ${formatDate(day.date)}`}
-                          className={`aspect-square w-full rounded-[2px] opacity-80 outline-none transition-[opacity,transform] hover:scale-125 hover:opacity-100 focus-visible:ring-1 focus-visible:ring-zinc-400 dark:opacity-70 dark:hover:opacity-100 dark:focus-visible:ring-zinc-500 ${color.cell}`}
+                          className={`aspect-square w-full rounded-[2px] opacity-80 outline-none transition-opacity hover:opacity-100 focus-visible:ring-1 focus-visible:ring-zinc-400 dark:opacity-70 dark:hover:opacity-100 dark:focus-visible:ring-zinc-500 ${color.cell}`}
                           onMouseEnter={(event) => showTooltip(day, event)}
                           onMouseLeave={() => setTooltip(null)}
                           onFocus={(event) => showTooltip(day, event)}

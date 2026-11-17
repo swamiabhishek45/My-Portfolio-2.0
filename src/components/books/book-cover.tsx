@@ -21,13 +21,13 @@ export function BookCover({ book }: { book: Book }) {
               backgroundImage: `linear-gradient(155deg, ${book.accent} 0%, #0b0b0b 78%)`,
             }}
           >
-            <span className="font-mono text-[7px] tracking-[0.18em] text-white/45 uppercase">
+            <span className="font-mono text-[9px] tracking-[0.08em] text-white/60 uppercase">
               {book.year}
             </span>
             <span className="font-sans text-[11px] leading-tight font-bold text-white/90">
               {book.title}
             </span>
-            <span className="font-mono text-[7px] tracking-[0.16em] text-white/55 uppercase">
+            <span className="font-mono text-[9px] tracking-[0.08em] text-white/70 uppercase">
               {book.author}
             </span>
           </div>

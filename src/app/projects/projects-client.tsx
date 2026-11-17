@@ -1,8 +1,8 @@
 "use client";
 
+import { ChevronLeft } from "lucide-react";
 import type { Project } from "@/lib/projects";
 import { useRouter } from "next/navigation";
-import { IoIosArrowBack } from "react-icons/io";
 import { DottedGridSection } from "@/components/ui/dotted-grid";
 import Navbar from "@/components/navbar";
 import { SectionHeading } from "@/components/section-heading";
@@ -33,7 +33,7 @@ export default function ProjectsPageClient({
                 aria-label="Back to home"
                 className="cursor-pointer rounded-lg border border-dotted border-neutral-300 p-1.5 text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-800"
               >
-                <IoIosArrowBack className="text-lg" />
+                <ChevronLeft className="size-4" strokeWidth={1.5} aria-hidden />
               </button>
               <SectionHeading className="text-xl sm:text-2xl">
                 Projects

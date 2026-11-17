@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { IoIosArrowBack } from "react-icons/io";
-import { Calendar, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Calendar, ChevronLeft } from "lucide-react";
 import { DottedGridSection } from "@/components/ui/dotted-grid";
 import { SectionHeading } from "@/components/section-heading";
 import Navbar from "@/components/navbar";
@@ -32,7 +31,7 @@ export default async function BlogPage() {
                 href="/"
                 className="p-1.5 rounded-lg border border-dotted border-neutral-300 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
               >
-                <IoIosArrowBack className="text-lg" />
+                <ChevronLeft className="size-4" strokeWidth={1.5} aria-hidden />
               </Link>
               <SectionHeading className="text-xl sm:text-2xl">Blogs</SectionHeading>
             </div>
@@ -56,7 +55,7 @@ export default async function BlogPage() {
                   href={post.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex flex-col gap-3 rounded-2xl border border-dotted border-neutral-300 bg-neutral-50/20 p-5 transition-all hover:border-neutral-400 dark:border-neutral-800/80 dark:bg-neutral-900/20 dark:hover:border-neutral-700"
+                  className="group flex flex-col gap-3 rounded-2xl border border-dotted border-neutral-300 bg-neutral-50/20 p-5 transition-colors hover:border-neutral-400 dark:border-neutral-800/80 dark:bg-neutral-900/20 dark:hover:border-neutral-700"
                 >
                   <div className="flex items-center justify-between text-xs font-mono text-neutral-500">
                     <span className="flex items-center gap-1">

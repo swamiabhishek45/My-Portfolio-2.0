@@ -1,8 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { IoIosArrowBack } from "react-icons/io";
-import { Heart, Film, Tv, Sparkles } from "lucide-react";
+import { ChevronLeft, Film, Heart, Sparkles, Tv } from "lucide-react";
 import { DottedGridSection } from "@/components/ui/dotted-grid";
 import Navbar from "@/components/navbar";
 import { MediaSection } from "@/components/favorites/media-section";
@@ -30,10 +29,10 @@ export default function FavoritesPage() {
                 onClick={() => router.push("/")}
                 className="p-1.5 rounded-lg border border-dotted border-neutral-300 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition cursor-pointer"
               >
-                <IoIosArrowBack className="text-lg" />
+                <ChevronLeft className="size-4" strokeWidth={1.5} aria-hidden />
               </button>
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 flex items-center gap-2">
-                <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
+                <Heart className="size-5 text-neutral-500 dark:text-neutral-400" strokeWidth={1.5} aria-hidden />
                 Favorites
               </h1>
             </div>
@@ -45,11 +44,9 @@ export default function FavoritesPage() {
           <DottedGridSection id="favorites-list" className="px-3 pb-6 pt-2 sm:px-6 sm:pb-8">
             <div className="favorites-screening-room rounded-2xl border border-dotted border-neutral-300/80 px-4 py-6 sm:px-6 sm:py-8 dark:border-neutral-800/80">
               <div className="mb-6 flex items-baseline justify-between gap-3">
-                <p className="font-mono text-[10px] tracking-[0.28em] text-neutral-500 uppercase">
-                  Screening room
-                </p>
+                <p className="font-mono text-xs text-neutral-500">Screening room</p>
                 <p className="font-mono text-[10px] text-neutral-500 dark:text-neutral-600">
-                  Tap to focus · hover to spotlight
+                  Tap to focus
                 </p>
               </div>
 

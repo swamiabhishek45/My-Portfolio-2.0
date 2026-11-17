@@ -17,7 +17,7 @@ export default function Projects({
 
   return (
     <section className="flex w-full flex-col">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3.5">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {visibleProjects.map((project) => (
           <ProjectCard key={project.slug} project={project} />
         ))}

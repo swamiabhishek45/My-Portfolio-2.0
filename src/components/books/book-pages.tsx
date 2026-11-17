@@ -21,7 +21,7 @@ export function BookPages({ book }: { book: Book }) {
 
       <div className="book3d-page book3d-paper">
         <div className="flex h-full w-full flex-col justify-between py-3 pr-2 pl-4 text-right">
-          <p className="font-mono text-[6px] tracking-[0.2em] text-stone-500 uppercase">
+          <p className="font-mono text-[9px] tracking-[0.08em] text-stone-500 uppercase">
             {book.year}
           </p>
 
@@ -29,12 +29,12 @@ export function BookPages({ book }: { book: Book }) {
             <h3 className="font-sans text-[9px] leading-[1.25] font-bold text-stone-900">
               {book.title}
             </h3>
-            <p className="font-mono text-[6px] tracking-[0.16em] text-stone-600 uppercase">
+            <p className="font-mono text-[9px] tracking-[0.08em] text-stone-600 uppercase">
               {book.author}
             </p>
           </div>
 
-          <p className="font-sans text-[7px] leading-[1.5] text-stone-600 italic">
+          <p className="font-sans text-[9px] leading-[1.5] text-stone-600">
             &ldquo;{book.excerpt}&rdquo;
           </p>
         </div>

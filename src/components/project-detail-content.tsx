@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { IoIosArrowBack } from "react-icons/io";
-import { ExternalLink, Github } from "lucide-react";
+import { ChevronLeft, ExternalLink, Github } from "lucide-react";
 
 import type { Project } from "@/lib/projects";
 import { cn } from "@/lib/utils";
@@ -9,19 +8,10 @@ import { DottedGridSection } from "@/components/ui/dotted-grid";
 import Navbar from "@/components/navbar";
 import { SectionHeading } from "@/components/section-heading";
 
-const DEFAULT_GRADIENT =
-  "bg-gradient-to-br from-neutral-200/30 via-neutral-100/10 to-neutral-950 dark:from-neutral-700/40 dark:via-neutral-900/20 dark:to-neutral-950";
-
-const GRADIENT_PRESETS: Record<string, string> = {
-  lime: "bg-gradient-to-br from-lime-300 via-emerald-200 to-green-400 dark:from-lime-500/50 dark:via-emerald-600/30 dark:to-green-800/40",
-  rose: "bg-gradient-to-br from-pink-300 via-rose-200 to-orange-300 dark:from-pink-500/50 dark:via-rose-600/30 dark:to-orange-700/40",
-  sky: "bg-gradient-to-br from-sky-300 via-cyan-200 to-blue-400 dark:from-sky-500/50 dark:via-cyan-600/30 dark:to-blue-800/40",
-};
-
-function resolveGradient(gradient?: string) {
-  if (!gradient) return DEFAULT_GRADIENT;
-  return GRADIENT_PRESETS[gradient] ?? gradient;
-}
+// One quiet mat from the neutral ramp. A small tone shift inside a single
+// neutral, so the screenshot is the only colour in the card.
+const SCREENSHOT_MAT =
+  "bg-gradient-to-b from-neutral-100 to-neutral-200/70 dark:from-neutral-900 dark:to-neutral-950";
 
 function DetailSection({
   title,
@@ -63,7 +53,7 @@ export function ProjectDetailContent({ project }: { project: Project }) {
                 className="rounded-lg border border-dotted border-neutral-300 p-1.5 text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-800"
                 aria-label="Back to projects"
               >
-                <IoIosArrowBack className="text-lg" />
+                <ChevronLeft className="size-4" strokeWidth={1.5} aria-hidden />
               </Link>
               <div>
                 <SectionHeading className="text-xl sm:text-2xl">
@@ -84,11 +74,11 @@ export function ProjectDetailContent({ project }: { project: Project }) {
           <DottedGridSection id="project-hero" className="px-2 py-2 sm:px-3">
             <div
               className={cn(
-                "overflow-hidden rounded-2xl border border-dotted border-neutral-300/80 p-3 dark:border-neutral-800/80",
-                resolveGradient(project.gradient)
+                "overflow-hidden rounded-2xl border border-dotted border-neutral-300/80 p-2 dark:border-neutral-800/80",
+                SCREENSHOT_MAT
               )}
             >
-              <div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-white/20 bg-neutral-950 shadow-[0_16px_40px_-20px_rgba(0,0,0,0.85)]">
+              <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-black/10 bg-neutral-950 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.6)] dark:border-white/10">
                 {project.src ? (
                   <Image
                     src={project.src}

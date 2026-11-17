@@ -1,7 +1,7 @@
 "use client";
 
+import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { IoIosArrowBack } from "react-icons/io";
 import { DottedGridSection } from "@/components/ui/dotted-grid";
 import Navbar from "@/components/navbar";
 import { BookGrid } from "@/components/books/book-grid";
@@ -28,7 +28,7 @@ export default function BooksPage() {
                 aria-label="Back to home"
                 className="cursor-pointer rounded-lg border border-dotted border-neutral-300 p-1.5 text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-800"
               >
-                <IoIosArrowBack className="text-lg" />
+                <ChevronLeft className="size-4" strokeWidth={1.5} aria-hidden />
               </button>
               <h1 className="text-xl font-bold tracking-tight text-neutral-900 sm:text-2xl dark:text-neutral-50">
                 Books
@@ -42,7 +42,7 @@ export default function BooksPage() {
           <DottedGridSection id="book-shelf" className="py-4">
             <div className="book-shelf-backdrop overflow-visible rounded-2xl border border-dotted border-neutral-300 px-5 py-8 sm:px-8 sm:py-10 dark:border-neutral-800/80">
               <div className="mb-7 flex items-baseline justify-between">
-                <h2 className="font-mono text-[10px] tracking-[0.28em] text-neutral-500 uppercase dark:text-neutral-500">
+                <h2 className="font-mono text-xs text-neutral-500 dark:text-neutral-500">
                   Shelf
                 </h2>
                 <p className="font-mono text-[10px] text-neutral-500 dark:text-neutral-600">

@@ -21,7 +21,6 @@ export default function Header() {
   const [currentTime, setCurrentTime] = useState("");
 
   const ref = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const isInView = useInView(ref);
   const play = isInView;
 
@@ -68,70 +67,11 @@ export default function Header() {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animationFrameId: number;
-    let width = canvas.width;
-    let height = canvas.height;
-
-    const handleResize = () => {
-      if (canvas.parentElement) {
-        canvas.width = canvas.parentElement.clientWidth;
-        canvas.height = canvas.parentElement.clientHeight;
-        width = canvas.width;
-        height = canvas.height;
-      }
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    const numParticles = 40;
-    const particles = Array.from({ length: numParticles }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      size: Math.random() * 1.5 + 0.5,
-      speedX: (Math.random() - 0.5) * 0.3,
-      speedY: (Math.random() - 0.5) * 0.3,
-      opacity: Math.random() * 0.6 + 0.2,
-    }));
-
-    const render = () => {
-      ctx.clearRect(0, 0, width, height);
-
-      particles.forEach((p) => {
-        p.x += p.speedX;
-        p.y += p.speedY;
-
-        if (p.x < 0) p.x = width;
-        if (p.x > width) p.x = 0;
-        if (p.y < 0) p.y = height;
-        if (p.y > height) p.y = 0;
-
-        ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      animationFrameId = requestAnimationFrame(render);
-    };
-
-    render();
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
 
   const article = WORDS[wordIndex] === "Engineer" ? "an" : "a";
 
   return (
-    <section className="border border-dotted border-neutral-300 dark:border-neutral-800/80 rounded-2xl bg-neutral-50/20 dark:bg-neutral-900/20 relative overflow-hidden transition-all duration-300 flex flex-col">
+    <section className="border border-dotted border-neutral-300 dark:border-neutral-800/80 rounded-2xl bg-neutral-50/20 dark:bg-neutral-900/20 relative overflow-hidden transition-colors duration-200 flex flex-col">
       {/* Top Panoramic Hero Banner */}
       <div className="relative w-full h-40 sm:h-48 overflow-hidden border-b border-dotted border-neutral-300 dark:border-neutral-800/80 group">
         <Image
@@ -154,15 +94,9 @@ export default function Header() {
           quality={75}
           className="hidden object-cover object-center brightness-90 filter transition-transform duration-700 group-hover:scale-105 dark:block"
         />
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 w-full h-full pointer-events-none z-[4]"
-          width={491}
-          height={200}
-        />
         {/* Pixel Art Overlay Clock at Bottom Right */}
         <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded border border-neutral-700/50 text-xs font-mono text-neutral-300 shadow-sm flex items-center gap-1.5 select-none z-10">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden />
           <span>{currentTime || "16:50:55"}</span>
         </div>
       </div>
@@ -226,20 +160,14 @@ export default function Header() {
 
             {/* Wakatime / Activity Status Bar */}
             <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-neutral-700 dark:text-neutral-400 min-h-4 font-mono font-medium truncate">
-              <span className="relative flex h-2 w-2 shrink-0">
-                {isCooking && (
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                )}
-                <span
-                  className={`relative inline-flex rounded-full h-2 w-2 ${
-                    isCooking
-                      ? "bg-green-500"
-                      : showStatusLoading
-                        ? "bg-neutral-300 dark:bg-neutral-600 animate-pulse"
-                        : "bg-neutral-400 dark:bg-neutral-600"
-                  }`}
-                ></span>
-              </span>
+              <span
+                aria-hidden
+                className={`h-2 w-2 shrink-0 rounded-full ${
+                  isCooking
+                    ? "bg-emerald-600 dark:bg-emerald-500"
+                    : "bg-neutral-400 dark:bg-neutral-600"
+                }`}
+              />
               <span className="flex min-w-0 items-center gap-1 truncate">
                 {showStatusLoading ? (
                   <span className="text-neutral-500">Syncing activity…</span>

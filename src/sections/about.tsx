@@ -43,7 +43,7 @@ export default function About() {
       <div className="border border-dotted border-neutral-300 dark:border-neutral-800/80 p-4 rounded-2xl bg-neutral-50/10 dark:bg-neutral-900/10">
         {/* Inner Card */}
         <div className="border border-dotted border-neutral-200/80 dark:border-neutral-800/60 p-5 rounded-xl bg-white/40 dark:bg-black/50 backdrop-blur-xs flex flex-col gap-4">
-          <ul className="flex flex-col gap-3.5">
+          <ul className="flex flex-col gap-4">
             {/* Always Visible Bullets */}
             {visibleBullets.map((bullet, index) => (
               <li
@@ -77,7 +77,7 @@ export default function About() {
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="overflow-hidden flex flex-col gap-3.5"
+                  className="overflow-hidden flex flex-col gap-4"
                 >
                   {collapsibleBullets.map((bullet, index) => (
                     <div
@@ -113,9 +113,9 @@ export default function About() {
               onClick={handleToggle}
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
-              className="flex items-center gap-1.5 text-xs font-mono font-semibold text-neutral-500 hover:text-neutral-950 dark:text-neutral-400 dark:hover:text-white transition-colors cursor-pointer select-none"
+              className="flex items-center gap-1.5 text-xs font-mono font-medium text-neutral-500 hover:text-neutral-950 dark:text-neutral-400 dark:hover:text-white transition-colors cursor-pointer select-none"
             >
-              <span>{isExpanded ? "SHOW LESS" : "SHOW MORE"}</span>
+              <span>{isExpanded ? "Show less" : "Show more"}</span>
               <ChevronDownIcon
                 ref={iconRef}
                 className="w-3.5 h-3.5 text-neutral-500 hover:text-neutral-950 dark:text-neutral-400 dark:hover:text-white transition-colors"

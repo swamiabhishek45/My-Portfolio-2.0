@@ -52,7 +52,7 @@ export function BookCard({ book }: { book: Book }) {
           <p className="truncate font-sans text-[9px] font-bold text-neutral-800 dark:text-neutral-200">
             {book.title}
           </p>
-          <p className="truncate font-mono text-[8px] tracking-[0.12em] text-neutral-500 uppercase">
+          <p className="truncate font-mono text-[9px] tracking-[0.08em] text-neutral-500 uppercase">
             {book.author} · {book.status}
           </p>
         </div>
@@ -62,10 +62,10 @@ export function BookCard({ book }: { book: Book }) {
           <p className="font-sans text-[10px] leading-tight font-bold text-white">
             {book.title}
           </p>
-          <p className="mt-1 font-mono text-[7px] tracking-[0.16em] text-white/60 uppercase">
+          <p className="mt-1 font-mono text-[9px] tracking-[0.08em] text-white/70 uppercase">
             {book.author}
           </p>
-          <p className="mt-2 font-sans text-[8px] leading-[1.5] text-white/75 italic">
+          <p className="mt-2 font-sans text-[9px] leading-[1.5] text-white/80">
             &ldquo;{book.excerpt}&rdquo;
           </p>
         </div>
